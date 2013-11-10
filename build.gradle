@@ -1,0 +1,43 @@
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin:'application'
+
+group= '<44>'
+version = '0.1'
+mainClassName = "info.tss.netassistant.run.Starter"
+
+repositories {
+    flatDir { dirs "lib" }
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.1.0'
+    compile 'log4j:log4j:1.2.16'
+    compile 'org.slf4j:slf4j-api:1.7.5'
+    compile 'org.slf4j:slf4j-log4j12:1.7.5'
+    compile 'javax.mail:mail:1.4.3'
+    // compile 'asm:asm-all:3.3.1'
+    compile 'org.jsoup:jsoup:1.7.2'
+    compile 'org.xerial:sqlite-jdbc:3.7.2'
+    compile 'org.quartz-scheduler:quartz:2.1.7'
+
+    testCompile 'junit:junit:4.11'
+
+    compile ":sqlite-connection-pool:"
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDirs = ['src/groovy']
+        }
+        resources.srcDir "src/groovy"
+    }
+
+    test {
+        groovy {
+            srcDirs = ['test/groovy']
+        }
+    }
+}
