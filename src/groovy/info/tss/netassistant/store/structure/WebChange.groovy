@@ -17,6 +17,10 @@ class WebChange {
 
     @Override
     String toString() {
-        return this.url;
+        if(!viewed && (added_txt || deleted_txt)) {
+            return "<html><font color='orange'>" + this.url + "</font><html>";
+        } else {
+            return this.url;
+        }
     }
 }

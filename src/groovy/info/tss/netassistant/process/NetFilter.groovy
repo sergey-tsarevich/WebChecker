@@ -19,34 +19,17 @@ public class NetFilter {
     public static final String IE_10_USER_AGENT_HEADER = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36";
     public static final int DEFAULT_SOCKET_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
     public static final int REQUEST_REPEATS_ON_ERRORS = 3;
+    private static Logger log = LoggerFactory.getLogger(NetFilter.class);
 
-    private Logger log = LoggerFactory.getLogger(NetFilter.class);
-    SqLiteManager man;
-
-    NetFilter(SqLiteManager man) {
-        this.man = man;
-    }
-
-    // main method to request sources.
-    public void filterResources() {
-        def startTime = System.currentTimeMillis()
-
-        for (WebChange wc : man.getAllWebChanges()) {
-            def attempts = 0;
-            while (!makelRequest(wc) || attempts++ < REQUEST_REPEATS_ON_ERRORS);
-        }
-
-        log.info("_Total filtering executing time(min): " + TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - startTime));
-    }
-
-    private boolean makelRequest(WebChange wc) {
+    private static boolean makelRequest(WebChange wc) {
         try {
             Document detailDoc = Jsoup.connect(wc.url).timeout(DEFAULT_SOCKET_TIMEOUT)
                     .userAgent(IE_10_USER_AGENT_HEADER).get();
-            println detailDoc.text();
+            def currTxt = detailDoc.text();
+            wc.last_check = new Date()
+            // todo: add diff parser
 //        Elements adAttrs = detailDoc.select("#content tr[class!=header]");
 //        mapScript.eachMatch(/YMaps.GeoPoint\(([\d\.]+)[\s,]*([\d\.]+)/) { geoCoords << it}
-
             return true;
         } catch (SocketTimeoutException s) { //repeat read
             log.error("!!!Timeout skip: " + s.message);
@@ -58,6 +41,15 @@ public class NetFilter {
             }
             return false;
         }
+    }
+
+    public static void request(webChangesList) {
+        // todo: parralelize me!
+        webChangesList.each{wch-> //WebChange
+            def attempts = 0;
+            while (!makelRequest(wch) || attempts++ < REQUEST_REPEATS_ON_ERRORS);
+        }
+        //bath update
     }
 
 }

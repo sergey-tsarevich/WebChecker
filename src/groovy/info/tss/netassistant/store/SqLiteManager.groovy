@@ -17,7 +17,6 @@ public class SqLiteManager {
     def sql;
 
     private SqLiteManager() {
-
         this.sql = DbInitializer.DI.sql;
     }
 
@@ -45,7 +44,7 @@ public class SqLiteManager {
 
     def int updateWChangeViewed(def id, def viewed){
         def query = "update WEB_CHANGE set viewed=? where id=?"
-        return sql.executeUpdate(query, [viewed ? 1:0, id]);
+        return sql.executeUpdate(query, [(viewed ? 1:0), id]);
     }
 
     def deleteWChange(def changeId) {

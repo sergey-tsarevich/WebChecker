@@ -19,10 +19,12 @@ public class HttpFilterTest extends GroovyTestCase {
     }
 
     public void testJsoupParsing() throws IOException {
-        if (true) return;// todo: impl tests)
-
-        Document doc = Jsoup.connect("http://realt.by/sale/flats/show/database/").
+        Document doc = Jsoup.connect("http://test.com/").timeout(1000).
                 userAgent("Mozilla/5.0").get();
+//        print doc.text();
+        assertNotNull(doc.text())
+
+        if (true) return;// todo: impl tests)
         Elements links = doc.select(".link-single a");
         List<String> adIds = new ArrayList<String>();
 
