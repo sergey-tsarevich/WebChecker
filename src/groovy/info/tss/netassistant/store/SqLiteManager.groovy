@@ -51,21 +51,17 @@ public class SqLiteManager {
         return sql.execute("delete from WEB_CHANGE where id=? ", [changeId]);
     }
 
-    /*
-    def saveAdList(List<Ad> ads){
-        if(!ads) return;
+    def saveWebChangesList(List<WebChange> changes){
+        if(!changes) return;
         def startTime = System.currentTimeMillis()
-        sql.withBatch("""INSERT INTO $WEB_CHANGE_TABLE (resource_id, native_id , description , raw_address, raw_area, rooms_count, floor, wc,
-                                                    build_date, raw_price, price, area, address, longitude, latitude, status)
-                         values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""") { ps ->
-            ads.each{ad->
-                ps.addBatch([ad.resource_id, ad.native_id, ad.description, ad.raw_address, ad.raw_area, ad.rooms_count, ad.floor, ad.wc, ad.build_date, ad.raw_price, ad.price, ad.area, ad.address, ad.longitude, ad.latitude, ad.status])
+        sql.withBatch("""update $WEB_CHANGE_TABLE set last_check=?, prev_txt=?, curr_txt=?, added_txt=?, deleted_txt=? where id=? """) { ps ->
+            changes.each{wch->
+                ps.addBatch([wch.last_check, wch.prev_txt, wch.curr_txt, wch.added_txt, wch.deleted_txt, wch.id])
             }
         }
 
-        if (log.isDebugEnabled()) log.debug("saveAdList: Executing time: " + (System.currentTimeMillis() - startTime));
+        if (log.isDebugEnabled()) log.debug("saveWebChangesList: Executing time: " + (System.currentTimeMillis() - startTime));
     }
-*/
 
 }
 

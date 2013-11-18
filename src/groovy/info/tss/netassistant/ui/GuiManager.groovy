@@ -52,6 +52,8 @@ class GuiManager {
                         currentWChId = w.id
                         swing.urlFld.text = w.url
                         swing.viewedChBox.selected = w.viewed
+                        swing.fullTxtPane.text = w.curr_txt
+                        swing.changesPane.text = w.added_txt
                     }; // can be null on multi selection
                 }
             })
@@ -83,12 +85,13 @@ class GuiManager {
                 def l = e.source
                 if (currentWChId) {
                     JOptionPane.showMessageDialog(null, 'Choose item first!' + l.selected + " : " + currentWChId)
-                    def f = sqlMan.updateWChangeViewed(currentWChId, l.selected)
+                    sqlMan.updateWChangeViewed(currentWChId, l.selected)
                 } else JOptionPane.showMessageDialog(null, 'Choose item first!')
             })
         }
 
-        def frame = swing.frame(title: '<44>', size: [600, 800], defaultCloseOperation: EXIT_ON_CLOSE, show: true) {
+//        def frame = swing.frame(title: '<44>', size: [600, 800], defaultCloseOperation: EXIT_ON_CLOSE, show: true) {
+        def frame = swing.frame(title: '<44>', size: [500, 700], defaultCloseOperation: EXIT_ON_CLOSE, show: true) {
             panel {
                 borderLayout()
                 panel(constraints: NORTH, border: BorderFactory.createTitledBorder('url:')) {

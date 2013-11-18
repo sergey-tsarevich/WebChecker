@@ -10,6 +10,5 @@ informer.log
 *.iws
 
 # Package Files #
-*.jar
 *.war
 *.ear

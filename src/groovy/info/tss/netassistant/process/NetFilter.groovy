@@ -2,6 +2,7 @@ package info.tss.netassistant.process
 
 import info.tss.netassistant.store.SqLiteManager
 import info.tss.netassistant.store.structure.WebChange
+import info.tss.netassistant.ui.InputValidator
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -23,10 +24,21 @@ public class NetFilter {
 
     private static boolean makelRequest(WebChange wc) {
         try {
-            Document detailDoc = Jsoup.connect(wc.url).timeout(DEFAULT_SOCKET_TIMEOUT)
+            def url = InputValidator.autoCompleteUrl(wc.url)
+            Document detailDoc = Jsoup.connect(url).timeout(DEFAULT_SOCKET_TIMEOUT)
                     .userAgent(IE_10_USER_AGENT_HEADER).get();
             def currTxt = detailDoc.text();
             wc.last_check = new Date()
+            if (currTxt && currTxt!=wc.curr_txt){
+                wc.prev_txt = wc.curr_txt
+                wc.curr_txt = currTxt
+                def currWords = wc.curr_txt.split("\\s+")
+                def prevWords = wc.prev_txt.split("\\s+")
+                def diffAddedArr = currWords - prevWords
+                def diffDeletedArr = prevWords - currWords
+                wc.added_txt = diffAddedArr.join(" ")
+                wc.deleted_txt = diffDeletedArr.join(" ")
+            }
             // todo: add diff parser
 //        Elements adAttrs = detailDoc.select("#content tr[class!=header]");
 //        mapScript.eachMatch(/YMaps.GeoPoint\(([\d\.]+)[\s,]*([\d\.]+)/) { geoCoords << it}
@@ -49,7 +61,7 @@ public class NetFilter {
             def attempts = 0;
             while (!makelRequest(wch) || attempts++ < REQUEST_REPEATS_ON_ERRORS);
         }
-        //bath update
+        SqLiteManager.SL.saveWebChangesList(Arrays.asList(webChangesList))
     }
 
 }
