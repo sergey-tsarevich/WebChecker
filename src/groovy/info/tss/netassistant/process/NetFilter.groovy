@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
  * Date: 22.02.2013
  */
 public class NetFilter {
-    public static final String IE_10_USER_AGENT_HEADER = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36";
+    public static final String USER_AGENT_HEADER = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36";
     public static final int DEFAULT_SOCKET_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
     public static final int REQUEST_REPEATS_ON_ERRORS = 3;
     private static Logger log = LoggerFactory.getLogger(NetFilter.class);
@@ -26,7 +26,7 @@ public class NetFilter {
         try {
             def url = InputValidator.autoCompleteUrl(wc.url)
             Document detailDoc = Jsoup.connect(url).timeout(DEFAULT_SOCKET_TIMEOUT)
-                    .userAgent(IE_10_USER_AGENT_HEADER).get();
+                    .userAgent(USER_AGENT_HEADER).get();
             def currTxt = detailDoc.text();
             wc.last_check = new Date()
             if (currTxt && currTxt!=wc.curr_txt){
@@ -37,6 +37,7 @@ public class NetFilter {
                 def diffAddedArr = currWords - prevWords
                 def diffDeletedArr = prevWords - currWords
                 wc.added_txt = diffAddedArr.join(" ")
+                wc.viewed = 0
                 wc.deleted_txt = diffDeletedArr.join(" ")
             }
             // todo: add diff parser

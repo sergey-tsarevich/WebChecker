@@ -54,9 +54,9 @@ public class SqLiteManager {
     def saveWebChangesList(List<WebChange> changes){
         if(!changes) return;
         def startTime = System.currentTimeMillis()
-        sql.withBatch("""update $WEB_CHANGE_TABLE set last_check=?, prev_txt=?, curr_txt=?, added_txt=?, deleted_txt=? where id=? """) { ps ->
+        sql.withBatch("""update $WEB_CHANGE_TABLE set last_check=?, prev_txt=?, curr_txt=?, added_txt=?, deleted_txt=?, viewed=? where id=? """) { ps ->
             changes.each{wch->
-                ps.addBatch([wch.last_check, wch.prev_txt, wch.curr_txt, wch.added_txt, wch.deleted_txt, wch.id])
+                ps.addBatch([wch.last_check, wch.prev_txt, wch.curr_txt, wch.added_txt, wch.deleted_txt, wch.viewed, wch.id])
             }
         }
 

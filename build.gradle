@@ -1,4 +1,5 @@
 apply plugin: 'groovy'
+apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin:'application'
 
@@ -33,11 +34,18 @@ sourceSets {
             srcDirs = ['src/groovy']
         }
         resources.srcDir "src/groovy"
+        java {
+            srcDirs = ['src/java']
+        }
+        resources.srcDir "src/java"
     }
 
     test {
         groovy {
             srcDirs = ['test/groovy']
+        }
+        java {
+            srcDirs = ['test/java']
         }
     }
 }

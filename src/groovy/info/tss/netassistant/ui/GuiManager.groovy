@@ -35,7 +35,7 @@ class GuiManager {
             }
         }
 
-        def currentWChId = 0;
+        def currentWCh = null
         def showMsg = { msg, color ->
             swing.infoLbl.text = "<html><font color='${color}'>${msg}</font></html>";
             new Timer().runAfter(5000) { swing.infoLbl.text = "" }
@@ -49,7 +49,7 @@ class GuiManager {
                 if (!e.valueIsAdjusting) {
                     WebChange w = l.selectedValue
                     if (w) {
-                        currentWChId = w.id
+                        currentWCh = w
                         swing.urlFld.text = w.url
                         swing.viewedChBox.selected = w.viewed
                         swing.fullTxtPane.text = w.curr_txt
@@ -83,9 +83,9 @@ class GuiManager {
             })
             action(id: 'changeViewed', closure: { e ->
                 def l = e.source
-                if (currentWChId) {
-                    JOptionPane.showMessageDialog(null, 'Choose item first!' + l.selected + " : " + currentWChId)
-                    sqlMan.updateWChangeViewed(currentWChId, l.selected)
+                if (currentWCh) {
+                    sqlMan.updateWChangeViewed(currentWCh.id, l.selected)
+                    currentWCh.viewed = l.selected ? 1 : 0
                 } else JOptionPane.showMessageDialog(null, 'Choose item first!')
             })
         }
