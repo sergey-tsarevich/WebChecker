@@ -14,6 +14,11 @@ class WebChange {
     def viewed = 0   // 0 and 1 - if change(s) was viewed
     def added_txt    // difference that was added
     def deleted_txt  // difference that was deleted
+    def prev_html    // previous html to compare
+    def curr_html    // current html to compare
+
+
+    def fullTxt      // full colored html for UI only
 
     @Override
     String toString() {

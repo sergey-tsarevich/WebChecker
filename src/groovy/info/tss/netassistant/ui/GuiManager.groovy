@@ -48,13 +48,14 @@ class GuiManager {
                 def l = e.source
                 if (!e.valueIsAdjusting) {
                     WebChange w = l.selectedValue
-                    if (w) {
+                    if (w) { // can be null on multi selection
                         currentWCh = w
                         swing.urlFld.text = w.url
                         swing.viewedChBox.selected = w.viewed
-                        swing.fullTxtPane.text = w.curr_txt
-                        swing.changesPane.text = w.added_txt
-                    }; // can be null on multi selection
+                        swing.fullTxtPane.text = w.fullTxt
+                        log.info('===\n ' + w.fullTxt)
+                        if (w.added_txt) swing.changesPane.text = "<html>" + w.added_txt.split("\b").join("<hr>") + "</html>"
+                    };
                 }
             })
             action(id: 'addAction', closure: { e ->
@@ -90,8 +91,7 @@ class GuiManager {
             })
         }
 
-//        def frame = swing.frame(title: '<44>', size: [600, 800], defaultCloseOperation: EXIT_ON_CLOSE, show: true) {
-        def frame = swing.frame(title: '<44>', size: [500, 700], defaultCloseOperation: EXIT_ON_CLOSE, show: true) {
+        def frame = swing.frame(title: '<44>', size: [600, 800], defaultCloseOperation: EXIT_ON_CLOSE, show: true) {
             panel {
                 borderLayout()
                 panel(constraints: NORTH, border: BorderFactory.createTitledBorder('url:')) {
@@ -117,7 +117,7 @@ class GuiManager {
                             }
                         }
                         scrollPane(constraints: CENTER, border: BorderFactory.createTitledBorder('added: ')) {
-                            textPane(id: 'changesPane')
+                            textPane(id: 'changesPane', contentType: 'text/html')
                         }
                     }
                     panel {
@@ -125,7 +125,7 @@ class GuiManager {
                         list(constraints: WEST, id: 'urlsList', model: listModel, valueChanged: selectAction.closure)
 
                         scrollPane(constraints: CENTER, border: BorderFactory.createTitledBorder('content: ')) {
-                            textPane(id: 'fullTxtPane')
+                            textPane(id: 'fullTxtPane', contentType: 'text/html')
                         }
                     }
                 }

@@ -21,8 +21,10 @@ public class DbInitializer {
             url TEXT,                   -- url to check for changes
             filter TEXT,                -- Some filter, todo: think about it!
             last_check DATETIME,        -- time of last check
-            prev_txt TEXT,              -- previous (html)text to compare
-            curr_txt TEXT,              -- current (html)text to compare
+            prev_txt TEXT,              -- previous text to compare
+            prev_html TEXT,              -- previous html to compare
+            curr_txt TEXT,              -- current text to compare
+            curr_html TEXT,              -- current html to compare
             viewed INTEGER default 0,   -- 0 and 1 - if change(s) was viewed
             added_txt TEXT,             -- difference that was added
             deleted_txt TEXT            -- difference that was deleted
