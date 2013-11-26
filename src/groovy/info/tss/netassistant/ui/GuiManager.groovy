@@ -32,6 +32,7 @@ class GuiManager {
             listModel.clear();
             sqlMan.getAllWebChanges().each {
                 listModel.addElement(it);
+                ViewHelper.calcDiffs(it);
             }
         }
 
@@ -50,17 +51,19 @@ class GuiManager {
                     WebChange w = l.selectedValue
                     if (w) { // can be null on multi selection
                         currentWCh = w
-                        swing.urlFld.text = w.url
+                        swing.urlFld.text = w.url?:""
+                        swing.filterFld.text = w.filter?:""
                         swing.viewedChBox.selected = w.viewed
-                        swing.fullTxtPane.text = w.fullTxt
-                        log.info('===\n ' + w.fullTxt)
-                        if (w.added_txt) swing.changesPane.text = "<html>" + w.added_txt.split("\b").join("<hr>") + "</html>"
+                        swing.fullTxtPane.text = w.fullTxt?:""
+                        if (w.added_txt) swing.changesPane.text = "<html>" + w.added_txt.split("\b").join("<hr><br>") + "</html>"
+                        else swing.changesPane.text = ""
                     };
                 }
             })
             action(id: 'addAction', closure: { e ->
                 def url = swing.urlFld.text;
-                if (InputValidator.isUrlAvailable(url) && sqlMan.createOrUpdateWChange(new WebChange(url: url))) {
+                if (InputValidator.isUrlAvailable(url) &&
+                        sqlMan.createOrUpdateWChange(new WebChange(url: url, filter: swing.filterFld.text))) {
                     showMsg('Added.', 'green')
                     refreshUrlsList()
                 } else {
@@ -104,7 +107,11 @@ class GuiManager {
                         panel(constraints: WEST) {
                             borderLayout()
                             label(constraints: NORTH, id: 'infoLbl', text: '')
-                            checkBox(constraints: CENTER, id: 'viewedChBox', text: 'Viewed', actionPerformed: changeViewed.closure)
+                            panel(constraints: CENTER){
+                                borderLayout()
+                                checkBox(constraints: CENTER, id: 'viewedChBox', text: 'Viewed', actionPerformed: changeViewed.closure)
+                                textField(constraints: SOUTH, id: 'filterFld')
+                            }
                             panel(constraints: SOUTH){
                                 borderLayout()
                                 panel(constraints: NORTH){

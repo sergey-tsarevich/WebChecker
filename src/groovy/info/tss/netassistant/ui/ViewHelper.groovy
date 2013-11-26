@@ -1,5 +1,6 @@
 package info.tss.netassistant.ui
 
+import info.tss.netassistant.store.structure.WebChange
 import name.fraser.neil.plaintext.diff_match_patch
 
 /**
@@ -19,7 +20,15 @@ public class ViewHelper {
         return url;
     }
 
-
+    /**
+     * Add html colored format to diffs.
+     * @param prev_txt - previous text
+     * @param curr_txt - current text
+     * @return list of three Strings:
+     *         [0] << full text
+     *         [1] << added text
+     *         [2] << deleted text
+     */
     static List<String> getColorizedHtml(String prev_txt, String curr_txt){
         def resultList = []
         if (!prev_txt || !curr_txt) return resultList
@@ -33,11 +42,11 @@ public class ViewHelper {
                     fullTxt += df.text + "\n"
                     break
                 case diff_match_patch.Operation.INSERT:
-                    addedTxt += df.text + "\n"
+                    if(df.text && df.text.trim()) addedTxt += df.text + "\n"
                     fullTxt += "<span style='background-color:#b0ffa0'>" + df.text + "</span>"
                     break
                 case diff_match_patch.Operation.DELETE:
-                    delTxt += df.text + "\n"
+                    if(df.text && df.text.trim()) delTxt += df.text + "\n"
                     fullTxt += "<span style='background-color:#ffa0a0'>" + df.text + "</span>"
                     break
                 default:    break
@@ -50,6 +59,14 @@ public class ViewHelper {
 
         return resultList;
     }
+
+    static void calcDiffs(WebChange wch){
+        def resultList = getColorizedHtml(wch.prev_txt, wch.curr_txt)
+        if(resultList[1]) wch.added_txt += "\b" + resultList[1]
+        if(resultList[2]) wch.deleted_txt += "\b" + resultList[2]
+        wch.fullTxt = resultList[0]?:"";
+    }
+
 
 
 

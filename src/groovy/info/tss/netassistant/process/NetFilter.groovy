@@ -3,10 +3,12 @@ package info.tss.netassistant.process
 import info.tss.netassistant.store.SqLiteManager
 import info.tss.netassistant.store.structure.WebChange
 import info.tss.netassistant.ui.ViewHelper
-import name.fraser.neil.plaintext.diff_match_patch
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.TextNode
+import org.jsoup.select.Elements
+import org.jsoup.select.NodeVisitor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -22,6 +24,7 @@ public class NetFilter {
     public static final int DEFAULT_SOCKET_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
     public static final int REQUEST_REPEATS_ON_ERRORS = 3;
     private static Logger log = LoggerFactory.getLogger(NetFilter.class);
+    private static NetFilter INST = new NetFilter();
 
     private static boolean makelRequest(WebChange wc) {
         try {
@@ -35,22 +38,22 @@ public class NetFilter {
                     .header("DNT", "1")
                     .header("Pragma", "no-cache")
                     .get();
-            def currTxt = detailDoc.text();
+            def currTxt = ""
+            if (wc.filter){
+                Elements adAttrs = detailDoc.select(wc.filter);
+                currTxt = INST.html2text(adAttrs)
+            } else {
+                currTxt = INST.html2text(detailDoc)
+            }
             wc.last_check = new Date()
             if (currTxt && currTxt!=wc.curr_txt) {
                 wc.prev_txt = wc.curr_txt
                 wc.curr_txt = currTxt
                 wc.prev_html = wc.curr_html
                 wc.curr_html = detailDoc.html()
-                def resultList = ViewHelper.getColorizedHtml(wc.prev_txt, wc.curr_txt)
-                wc.added_txt += "\b" + resultList[1]
                 wc.viewed = 0
-                wc.deleted_txt += "\b" + resultList[2]
-                wc.fullTxt = resultList[0];
+                ViewHelper.calcDiffs(wc)
             }
-            // todo: think about blocks text(separated by \n)
-//        Elements adAttrs = detailDoc.select("#content tr[class!=header]");
-//        mapScript.eachMatch(/YMaps.GeoPoint\(([\d\.]+)[\s,]*([\d\.]+)/) { geoCoords << it}
             return true;
         } catch (SocketTimeoutException s) { //repeat read
             log.error("!!!Timeout skip: " + s.message);
@@ -71,6 +74,29 @@ public class NetFilter {
             while (!makelRequest(wch) || attempts++ < REQUEST_REPEATS_ON_ERRORS);
         }
         SqLiteManager.SL.saveWebChangesList(Arrays.asList(webChangesList))
+    }
+
+    public String html2text(def doc) {
+        def resultStr = ""
+        doc.traverse(new NodeVisitor() {
+            def currLine = ""
+            @Override
+            void head(org.jsoup.nodes.Node node, int depth) {
+                if (node instanceof TextNode){
+                    currLine += ((TextNode)node).text() + "\t"
+                    if (currLine.size() > 100) {
+                        currLine = currLine.replaceAll("\\s{2,}", "\t")
+                        resultStr += currLine + "\n"
+                        currLine = ""
+                    }
+                }
+            }
+
+            @Override
+            void tail(org.jsoup.nodes.Node node, int depth) {}
+        });
+
+        return resultStr;
     }
 
 }
