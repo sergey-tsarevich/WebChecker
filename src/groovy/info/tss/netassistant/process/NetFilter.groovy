@@ -23,8 +23,9 @@ public class NetFilter {
     public static final String USER_AGENT_HEADER = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36";
     public static final int DEFAULT_SOCKET_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
     public static final int REQUEST_REPEATS_ON_ERRORS = 3;
+    public static NetFilter INST = new NetFilter();
     private static Logger log = LoggerFactory.getLogger(NetFilter.class);
-    private static NetFilter INST = new NetFilter();
+    private static final int LINE_WIDTH = 80
 
     private static boolean makelRequest(WebChange wc) {
         try {
@@ -84,7 +85,7 @@ public class NetFilter {
             void head(org.jsoup.nodes.Node node, int depth) {
                 if (node instanceof TextNode){
                     currLine += ((TextNode)node).text() + "\t"
-                    if (currLine.size() > 100) {
+                    if (currLine.size() > LINE_WIDTH * 0.7) {
                         currLine = currLine.replaceAll("\\s{2,}", "\t")
                         resultStr += currLine + "\n"
                         currLine = ""

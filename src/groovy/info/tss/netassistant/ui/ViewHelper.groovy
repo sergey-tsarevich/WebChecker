@@ -31,7 +31,10 @@ public class ViewHelper {
      */
     static List<String> getColorizedHtml(String prev_txt, String curr_txt){
         def resultList = []
-        if (!prev_txt || !curr_txt) return resultList
+        if (!prev_txt || !curr_txt) {
+            resultList << curr_txt
+            return resultList
+        }
         List<diff_match_patch.Diff> diffs = new diff_match_patch().diff_main(prev_txt, curr_txt);
         def fullTxt = "<html>";
         def addedTxt = "";

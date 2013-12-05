@@ -88,4 +88,20 @@ public class HttpFilterTest extends GroovyTestCase {
 
     }
 
+    public void testResponseFormatting(){
+        def f = "h:\\temp\\hh\\Белорусский православный информационный портал СОБОР.by.htm"
+//        Document doc = Jsoup.parse(new File(f),"UTF-8");
+        Document doc = Jsoup.parse(new File(f), "windows-1251");
+//        Elements adAttrs = doc.select("#rightcol");
+//        Elements adAttrs = doc.select("#sideone,#sidetwo,#sidethree,#rightcol div.r-div:eq(0),#rightcol div.r-div:eq(6)");
+//        Elements adAttrs = doc.select("#rightcol div.r-div:eq(1)");
+        Elements adAttrs = doc.select("a.menu-d");
+        def currTxt = NetFilter.INST.html2text(adAttrs)
+
+        assertNotNull(currTxt);
+        println currTxt
+
+    }
+
+
 }
