@@ -10,3 +10,6 @@ To build:
 To run: 
 	1) Go to "<project root directory>\build\distributions\WebChecker-0.1.zip" and unpack zip archive to directory where you want to install.
 	2) Run WebChecker-0.1\bin\WebChecker.bat for Windows or WebChecker-0.1\bin\WebChecker for Linux
+
+Thanks to:
+Free icon resource http://zen-nikki.deviantart.com/art/Web-browser-Icons-85610575

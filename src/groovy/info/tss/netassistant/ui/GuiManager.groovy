@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory
 
 import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
+import javax.swing.ImageIcon
 import javax.swing.JOptionPane
 
 import static java.awt.BorderLayout.*
@@ -94,7 +95,8 @@ class GuiManager {
             })
         }
 
-        def frame = swing.frame(title: '<44>', size: [600, 800], defaultCloseOperation: EXIT_ON_CLOSE, show: true) {
+        def frame = swing.frame(title: '<44>', size: [640, 480], defaultCloseOperation: EXIT_ON_CLOSE, show: true,
+                iconImage: new ImageIcon(swing.class.classLoader.getResource('4.png')).image) {
             panel {
                 borderLayout()
                 panel(constraints: NORTH, border: BorderFactory.createTitledBorder('url:')) {
@@ -139,6 +141,7 @@ class GuiManager {
             }
         }
 
+        adjustFrameSize(frame)
         centerOnScreen(frame)
     }
 
@@ -148,6 +151,13 @@ class GuiManager {
         int x = (screenSize.width - paneSize.width) / 2
         int y = (screenSize.height - paneSize.height) * 0.45
         component.setLocation(x, y)
+    }
+
+    def static adjustFrameSize(component) {
+        def screenSize = component.toolkit.screenSize
+        int x = screenSize.width * 0.7
+        int y = screenSize.height * 0.7
+        component.setSize(x, y)
     }
 
 }
