@@ -64,9 +64,11 @@ public class ViewHelper {
     }
 
     static void calcDiffs(WebChange wch){
-        def resultList = getColorizedHtml(wch.prev_txt, wch.curr_txt)
-        if(resultList[1]) wch.added_txt += "\b" + resultList[1]
-        if(resultList[2]) wch.deleted_txt += "\b" + resultList[2]
+        // todo: check if its rendering is ok -> if not use flag to mark to handle html
+//        def resultList = getColorizedHtml(wch.prev_txt, wch.curr_txt)
+        def resultList = getColorizedHtml(wch.prev_html, wch.curr_html)
+        if(resultList[1]) wch.added_txt += (wch.added_txt ? "\b" : "") + resultList[1]
+        if(resultList[2]) wch.deleted_txt += (wch.deleted_txt ? "\b" : "") + resultList[2]
         wch.fullTxt = resultList[0]?:"";
     }
 

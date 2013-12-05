@@ -33,7 +33,7 @@ class GuiManager {
             listModel.clear();
             sqlMan.getAllWebChanges().each {
                 listModel.addElement(it);
-                ViewHelper.calcDiffs(it);
+//                ViewHelper.calcDiffs(it);
             }
         }
 

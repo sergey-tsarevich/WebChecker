@@ -40,18 +40,21 @@ public class NetFilter {
                     .header("Pragma", "no-cache")
                     .get();
             def currTxt = ""
+            def currHtml = ""
             if (wc.filter){
                 Elements adAttrs = detailDoc.select(wc.filter);
                 currTxt = INST.html2text(adAttrs)
+                currHtml = adAttrs.outerHtml()
             } else {
                 currTxt = INST.html2text(detailDoc)
+                currHtml = detailDoc.outerHtml()
             }
             wc.last_check = new Date()
             if (currTxt && currTxt!=wc.curr_txt) {
                 wc.prev_txt = wc.curr_txt
                 wc.curr_txt = currTxt
                 wc.prev_html = wc.curr_html
-                wc.curr_html = detailDoc.html()
+                wc.curr_html = currHtml
                 wc.viewed = 0
                 ViewHelper.calcDiffs(wc)
             }
