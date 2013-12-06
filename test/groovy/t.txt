@@ -1,32 +1,4 @@
-Office.by: в
-ё в офи
-!	Лет
- 
-Болг
--2014
-Ит
-лия - горящ
- 
-ур
-!
-Бухгалтер	от 4000000 бел. руб.	БЕЛИНТЕРЛОГИСТИК	
-
-
-
-
-	
-
-
-	
-
-
-ов
-й
-апп
-р
-т
-Бо
-гар
-В
-п
-ск с Технобанком
+==todos:
+- clean up JTextPane from scripts, etc.
+- compare by whole words mode??
+- add notes tab

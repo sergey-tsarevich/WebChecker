@@ -10,7 +10,11 @@ import org.slf4j.LoggerFactory
 import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
 import javax.swing.ImageIcon
+import javax.swing.JEditorPane
 import javax.swing.JOptionPane
+import javax.swing.event.HyperlinkEvent
+import javax.swing.event.HyperlinkListener
+import java.awt.Desktop
 
 import static java.awt.BorderLayout.*
 import static javax.swing.JSplitPane.VERTICAL_SPLIT
@@ -22,18 +26,19 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE
  */
 class GuiManager {
     private static SqLiteManager sqlMan
+    private static SwingBuilder swing
     private static final Logger log = LoggerFactory.getLogger(GuiManager.class);
 
     public static void buildUI(SqLiteManager sMan) {
         sqlMan = sMan; // init
-        def swing = new SwingBuilder()
+        swing = new SwingBuilder()
 
         DefaultListModel listModel = new DefaultListModel();
         def refreshUrlsList = {
             listModel.clear();
             sqlMan.getAllWebChanges().each {
                 listModel.addElement(it);
-//                ViewHelper.calcDiffs(it);
+                ViewHelper.calcDiffs(it);
             }
         }
 
@@ -56,7 +61,7 @@ class GuiManager {
                         swing.filterFld.text = w.filter?:""
                         swing.viewedChBox.selected = w.viewed
                         swing.fullTxtPane.text = w.fullTxt?:""
-                        if (w.added_txt) swing.changesPane.text = "<html>" + w.added_txt.split("\b").join("<hr><br>") + "</html>"
+                        if (w.added_txt && !w.viewed) swing.changesPane.text = "<html>" + w.added_txt.split("\b").join("<hr><br>") + "</html>"
                         else swing.changesPane.text = ""
                     };
                 }
@@ -80,11 +85,16 @@ class GuiManager {
                 }
             })
             action(id: 'reqAction', closure: { e ->
+                def webChanges
                 if(urlsList.selectedValues.size()){
-                    NetFilter.request(urlsList.selectedValues)
+                    webChanges = urlsList.selectedValues
                 } else {
-                    NetFilter.request(listModel.toArray())
+                    webChanges = listModel.toArray()
                 }
+                if (!webChanges.every{ it.viewed }) return JOptionPane.showMessageDialog(null, 'Review selected items first!')
+
+                NetFilter.request(webChanges)
+                refreshUrlsList()
             })
             action(id: 'changeViewed', closure: { e ->
                 def l = e.source
@@ -140,6 +150,9 @@ class GuiManager {
                 }
             }
         }
+        // add hml link handlers
+        addLinkHandling(swing.fullTxtPane)
+        addLinkHandling(swing.changesPane)
 
         adjustFrameSize(frame)
         centerOnScreen(frame)
@@ -158,6 +171,24 @@ class GuiManager {
         int x = screenSize.width * 0.7
         int y = screenSize.height * 0.7
         component.setSize(x, y)
+    }
+
+    def static addLinkHandling(txtpane) {
+        txtpane.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
+        txtpane.setEditable(false);
+        txtpane.addHyperlinkListener(new HyperlinkListener() {
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    if (Desktop.isDesktopSupported()) { // supported from Java 6
+                        def url = e.getURL();
+                        if (!url) {
+                            url = swing.urlFld.text + "/" +e.description
+                        }
+                        Desktop.getDesktop().browse(url);
+                    }
+                }
+            }
+        });
     }
 
 }
