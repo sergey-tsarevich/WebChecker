@@ -63,15 +63,42 @@ public class HttpFilterTest extends GroovyTestCase {
         println addedTxt
     }
 
-    public void testHtmlColorizer(){
+    public void testHtmlColorizerText(){
         String p = new File("test/groovy/prev.txt").text;
         String c = new File("test/groovy/curr.txt").text;
-        def st = System.currentTimeMillis()
         def r = ViewHelper.getColorizedHtml(p,c)
-        r[0]
-        println TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - st)
-//        println  (System.currentTimeMillis() - st) + " ms"
-//        println r[0]
+        assertEquals("""Безвозмездно, то есть даром!\t
+	13 476 сообщений	В Уручье свой Вивальди\t
+	9236 сообщений	Рыбалка – дело клевое\t
+	11 717 сообщений	Made in China\t
+	2167
+""", r[1])
+    }
+
+    public void testHtmlColorizerHtml(){
+        String p = new File("test/groovy/p.htm").text;
+        String c = new File("test/groovy/c.htm").text;
+        def r = ViewHelper.getColorizedHtml(p,c)
+        assertEquals("""58bafdef17c5c92beb1c1c5161e0d43c
+e
+1051943
+Безвозмездно, то есть даром
+13 476
+й
+35ca4ac53ca187b49d3a384396127095
+1060274
+В Уручье свой Вивальди
+9236
+4a815055b3cf5695e13d1e0616b971c6
+e
+3865287
+Рыбалка – дело клевое
+11 717
+adca378116fea408bd125a0e030ed4bc
+6810733
+Made in China
+2167
+""", r[1])
     }
 
     public void testHtml2Text(){
@@ -90,24 +117,18 @@ public class HttpFilterTest extends GroovyTestCase {
 
     public void testResponseFormatting(){
         def f = "test/groovy/tst.html"
-//        Document doc = Jsoup.parse(new File(f),"UTF-8");
         Document doc = Jsoup.parse(new File(f), "windows-1251");
-//        Elements adAttrs = doc.select("#rightcol");
 //        Elements adAttrs = doc.select("#sideone,#sidetwo,#sidethree,#rightcol div.r-div:eq(0),#rightcol div.r-div:eq(6)");
 //        Elements adAttrs = doc.select("div.r-div");
         Elements adAttrs = doc.select("ul.recentposts");
 //        Elements adAttrs = doc.select("#rightcol");
+//        adAttrs.remove("script,iframe")
+        adAttrs.select("script,iframe,noscript,object").remove()
         println adAttrs.outerHtml()
-//        println adAttrs.html()
 
-//        println NetFilter.INST.html2text(adAttrs)
-/*
-        def currTxt = NetFilter.INST.html2text(adAttrs)
         def currTxt = NetFilter.INST.html2text(adAttrs)
         assertNotNull(currTxt);
-        println currTxt
-*/
-
+//        println currTxt
     }
 
 

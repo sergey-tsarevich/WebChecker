@@ -41,6 +41,7 @@ public class NetFilter {
                     .get();
             def currTxt = ""
             def currHtml = ""
+            detailDoc.select("script,iframe,noscript,object").remove();
             if (wc.filter){
                 Elements adAttrs = detailDoc.select(wc.filter);
                 currTxt = INST.html2text(adAttrs)

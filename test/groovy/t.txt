@@ -1,4 +1,0 @@
-==todos:
-- clean up JTextPane from scripts, etc.
-- compare by whole words mode??
-- add notes tab

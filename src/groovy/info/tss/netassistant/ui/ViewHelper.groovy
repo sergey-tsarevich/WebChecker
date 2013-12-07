@@ -35,7 +35,9 @@ public class ViewHelper {
             resultList << curr_txt
             return resultList
         }
-        List<diff_match_patch.Diff> diffs = new diff_match_patch().diff_main(prev_txt, curr_txt);
+        def var = new diff_match_patch()
+        List<diff_match_patch.Diff> diffs = var.diff_main(prev_txt, curr_txt);
+        var.diff_cleanupSemantic(diffs);
         def fullTxt = "<html>";
         def addedTxt = "";
         def delTxt = "";

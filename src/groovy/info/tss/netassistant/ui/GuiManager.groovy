@@ -184,7 +184,8 @@ class GuiManager {
                         if (!url) {
                             url = swing.urlFld.text + "/" +e.description
                         }
-                        Desktop.getDesktop().browse(url);
+//                        Desktop.getDesktop().browse(url); // works for windows
+                        Desktop.getDesktop().browse(url.toURI()); // works for linux, java 7 may be?
                     }
                 }
             }

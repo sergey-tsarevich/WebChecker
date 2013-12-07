@@ -13,3 +13,7 @@ To run:
 
 Thanks to:
 Free icon resource http://zen-nikki.deviantart.com/art/Web-browser-Icons-85610575
+
+
+==todos:
+- add notes tab
