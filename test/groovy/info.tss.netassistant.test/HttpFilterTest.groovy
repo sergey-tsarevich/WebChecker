@@ -118,17 +118,21 @@ Made in China
     public void testResponseFormatting(){
         def f = "test/groovy/tst.html"
         Document doc = Jsoup.parse(new File(f), "windows-1251");
-//        Elements adAttrs = doc.select("#sideone,#sidetwo,#sidethree,#rightcol div.r-div:eq(0),#rightcol div.r-div:eq(6)");
-//        Elements adAttrs = doc.select("div.r-div");
         Elements adAttrs = doc.select("ul.recentposts");
-//        Elements adAttrs = doc.select("#rightcol");
-//        adAttrs.remove("script,iframe")
         adAttrs.select("script,iframe,noscript,object").remove()
         println adAttrs.outerHtml()
-
         def currTxt = NetFilter.INST.html2text(adAttrs)
         assertNotNull(currTxt);
-//        println currTxt
+    }
+
+    public void testTmpQueries(){
+        def f = "test/groovy/n.html"
+        Document doc = Jsoup.parse(new File(f), "windows-1251");
+        Elements adAttrs = doc.select("div[style^=width:640px]");
+        adAttrs.select("script,iframe,noscript,object").remove()
+        println adAttrs.outerHtml()
+//        def currTxt = NetFilter.INST.html2text(adAttrs)
+//        assertNotNull(currTxt);
     }
 
 

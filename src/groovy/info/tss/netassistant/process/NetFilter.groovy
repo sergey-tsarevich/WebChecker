@@ -26,6 +26,7 @@ public class NetFilter {
     public static NetFilter INST = new NetFilter();
     private static Logger log = LoggerFactory.getLogger(NetFilter.class);
     private static final int LINE_WIDTH = 80
+    public static final String UNSUPPORTED_HTML_TAGS = "script,iframe,noscript,object,style"
 
     private static boolean makelRequest(WebChange wc) {
         try {
@@ -41,7 +42,7 @@ public class NetFilter {
                     .get();
             def currTxt = ""
             def currHtml = ""
-            detailDoc.select("script,iframe,noscript,object").remove();
+            detailDoc.select(UNSUPPORTED_HTML_TAGS).remove();
             if (wc.filter){
                 Elements adAttrs = detailDoc.select(wc.filter);
                 currTxt = INST.html2text(adAttrs)

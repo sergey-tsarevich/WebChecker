@@ -14,6 +14,8 @@ import javax.swing.JEditorPane
 import javax.swing.JOptionPane
 import javax.swing.event.HyperlinkEvent
 import javax.swing.event.HyperlinkListener
+import javax.swing.text.html.HTMLEditorKit
+import javax.swing.text.html.StyleSheet
 import java.awt.Desktop
 
 import static java.awt.BorderLayout.*
@@ -68,8 +70,10 @@ class GuiManager {
             })
             action(id: 'addAction', closure: { e ->
                 def url = swing.urlFld.text;
-                if (InputValidator.isUrlAvailable(url) &&
-                        sqlMan.createOrUpdateWChange(new WebChange(url: url, filter: swing.filterFld.text))) {
+                if (InputValidator.isUrlAvailable(url) ) {
+                    def change = new WebChange(url: url, filter: swing.filterFld.text)
+                    change.id = sqlMan.createOrUpdateWChange(change);
+                    NetFilter.request([change].toArray())
                     showMsg('Added.', 'green')
                     refreshUrlsList()
                 } else {
@@ -150,7 +154,11 @@ class GuiManager {
                 }
             }
         }
-        // add hml link handlers
+        // stylish
+        HTMLEditorKit kit = new HTMLEditorKit();
+        StyleSheet styleSheet = kit.getStyleSheet();
+        styleSheet.addRule("html {color:#000; font-family:times; margin: 4px; }");
+        swing.fullTxtPane.editorKit = kit
         addLinkHandling(swing.fullTxtPane)
         addLinkHandling(swing.changesPane)
 
