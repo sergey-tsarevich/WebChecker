@@ -95,17 +95,19 @@ class GuiManager {
                 } else {
                     webChanges = listModel.toArray()
                 }
-                if (!webChanges.every{ it.viewed }) return JOptionPane.showMessageDialog(null, 'Review selected items first!')
+                if (webChanges.every{ !it.viewed && !it.prev_txt}) return JOptionPane.showMessageDialog(null, 'Review selected items first!')
 
                 NetFilter.request(webChanges)
                 refreshUrlsList()
             })
             action(id: 'changeViewed', closure: { e ->
-                def l = e.source
-                if (currentWCh) {
-                    sqlMan.updateWChangeViewed(currentWCh.id, l.selected)
-                    currentWCh.viewed = l.selected ? 1 : 0
-                } else JOptionPane.showMessageDialog(null, 'Choose item first!')
+                def selected = e.source.selected
+                urlsList.selectedValues.each {
+                    sqlMan.updateWChangeViewed(it.id, selected)
+                    it.viewed = selected ? 1 : 0
+                    it.deleted_txt = ""
+                    it.added_txt = ""
+                }
             })
         }
 
@@ -190,7 +192,7 @@ class GuiManager {
                     if (Desktop.isDesktopSupported()) { // supported from Java 6
                         def url = e.getURL();
                         if (!url) {
-                            url = swing.urlFld.text + "/" +e.description
+                            url =  ViewHelper.autoCompleteUrl(swing.urlFld.text) + "/" +e.description
                         }
 //                        Desktop.getDesktop().browse(url); // works for windows
                         Desktop.getDesktop().browse(url.toURI()); // works for linux, java 7 may be?
