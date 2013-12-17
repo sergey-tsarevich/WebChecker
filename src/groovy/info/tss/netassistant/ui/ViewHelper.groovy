@@ -41,18 +41,65 @@ public class ViewHelper {
         def fullTxt = "<html>";
         def addedTxt = "";
         def delTxt = "";
+        def linkOld, linkNew
+        def lastOpenLinkIdx
+        def linkMode = false
         diffs.each { df ->
             switch ( df.operation ) {
                 case diff_match_patch.Operation.EQUAL:
-                    fullTxt += df.text + "\n"
+                    lastOpenLinkIdx = df.text.lastIndexOf("<a")
+                    if (linkMode || lastOpenLinkIdx > df.text.lastIndexOf("</a>")) {
+                        if(!linkMode) {
+                            linkMode = true
+                            linkNew = linkOld = df.text.substring(lastOpenLinkIdx);
+                            fullTxt += df.text.substring(0,lastOpenLinkIdx) + "\n"
+                            break //return
+                        }
+                        def endLinkIdx = df.text.indexOf('</a>')
+                        if (endLinkIdx >= 0) {
+                            linkNew += df.text.substring(0,endLinkIdx) + '</span></a>'
+                            linkOld += df.text.substring(0,endLinkIdx) + '</span></a>'
+
+                            def idx = linkNew.indexOf('>'); // end of <a tag
+                            linkNew = linkNew.substring(0, idx+1).replaceAll("\n","") + "<span style='background-color:#b0ffa0'>" + linkNew.substring(idx+1)
+                            fullTxt += linkNew
+
+                            def idxO = linkOld.indexOf('>'); // end of <a tag
+                            linkOld = linkOld.substring(0, idxO+1).replaceAll("\n","") + "<span style='background-color:#ffa0a0'>" + linkOld.substring(idxO+1)
+                            fullTxt += linkOld
+
+                            def remainTxt = df.text.substring(endLinkIdx + '</a>'.length());
+                            lastOpenLinkIdx = remainTxt.lastIndexOf("<a")
+                            if (lastOpenLinkIdx > remainTxt.lastIndexOf("</a>")) {
+                                linkNew = linkOld = remainTxt.substring(lastOpenLinkIdx);
+                                fullTxt += remainTxt.substring(0,lastOpenLinkIdx) + "\n"
+                            } else {
+                                fullTxt += remainTxt + "\n"
+                                linkMode = false;
+                            }
+                        } else {
+                            linkNew +=df.text
+                            linkOld +=df.text
+                        }
+                    } else {
+                        fullTxt += df.text + "\n"
+                    }
                     break
-                case diff_match_patch.Operation.INSERT:
+                case diff_match_patch.Operation.INSERT:                     // todo: consider linkMode
                     if(df.text && df.text.trim()) addedTxt += df.text + "\n"
-                    fullTxt += "<span style='background-color:#b0ffa0'>" + df.text + "</span>"
+                    if (linkMode) {
+                        linkNew += df.text
+                    } else {
+                        fullTxt += "<span style='background-color:#b0ffa0'>" + df.text + "</span>"
+                    }
                     break
-                case diff_match_patch.Operation.DELETE:
+                case diff_match_patch.Operation.DELETE:                     // todo: consider linkMode
                     if(df.text && df.text.trim()) delTxt += df.text + "\n"
-                    fullTxt += "<span style='background-color:#ffa0a0'>" + df.text + "</span>"
+                    if (linkMode) {
+                        linkOld += df.text
+                    } else {
+                        fullTxt += "<span style='background-color:#ffa0a0'>" + df.text + "</span>"
+                    }
                     break
                 default:    break
             }
