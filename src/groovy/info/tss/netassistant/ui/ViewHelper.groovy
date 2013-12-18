@@ -63,10 +63,12 @@ public class ViewHelper {
                             def idx = linkNew.indexOf('>'); // end of <a tag
                             linkNew = linkNew.substring(0, idx+1).replaceAll("\n","") + "<span style='background-color:#b0ffa0'>" + linkNew.substring(idx+1)
                             fullTxt += linkNew
+                            addedTxt += linkNew + "\n"
 
                             def idxO = linkOld.indexOf('>'); // end of <a tag
                             linkOld = linkOld.substring(0, idxO+1).replaceAll("\n","") + "<span style='background-color:#ffa0a0'>" + linkOld.substring(idxO+1)
                             fullTxt += linkOld
+                            delTxt += linkOld + "\n"
 
                             def remainTxt = df.text.substring(endLinkIdx + '</a>'.length());
                             lastOpenLinkIdx = remainTxt.lastIndexOf("<a")
@@ -85,19 +87,19 @@ public class ViewHelper {
                         fullTxt += df.text + "\n"
                     }
                     break
-                case diff_match_patch.Operation.INSERT:                     // todo: consider linkMode
-                    if(df.text && df.text.trim()) addedTxt += df.text + "\n"
+                case diff_match_patch.Operation.INSERT:
                     if (linkMode) {
                         linkNew += df.text
                     } else {
+                        addedTxt += df.text + "\n"
                         fullTxt += "<span style='background-color:#b0ffa0'>" + df.text + "</span>"
                     }
                     break
-                case diff_match_patch.Operation.DELETE:                     // todo: consider linkMode
-                    if(df.text && df.text.trim()) delTxt += df.text + "\n"
+                case diff_match_patch.Operation.DELETE:
                     if (linkMode) {
                         linkOld += df.text
                     } else {
+                        delTxt += df.text + "\n"
                         fullTxt += "<span style='background-color:#ffa0a0'>" + df.text + "</span>"
                     }
                     break
