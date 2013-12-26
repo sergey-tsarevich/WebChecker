@@ -1,5 +1,6 @@
 package info.tss.netassistant.process
 
+import info.tss.netassistant.notify.ChangesNotifier
 import info.tss.netassistant.store.SqLiteManager
 import info.tss.netassistant.store.structure.WebChange
 import info.tss.netassistant.ui.ViewHelper
@@ -27,6 +28,15 @@ public class NetFilter {
     private static Logger log = LoggerFactory.getLogger(NetFilter.class);
     private static final int LINE_WIDTH = 80
     public static final String UNSUPPORTED_HTML_TAGS = "script,iframe,noscript,object,style"
+
+    public static void request(webChangesList) {
+        // todo: parralelize me!
+        webChangesList.each{wch-> //WebChange
+            def attempts = 0;
+            while (!makelRequest(wch) || attempts++ < REQUEST_REPEATS_ON_ERRORS);
+        }
+        SqLiteManager.SL.saveWebChangesList(Arrays.asList(webChangesList))
+    }
 
     private static boolean makelRequest(WebChange wc) {
         try {
@@ -59,6 +69,7 @@ public class NetFilter {
                 wc.curr_html = currHtml
                 wc.viewed = 0
                 ViewHelper.calcDiffs(wc)
+                ChangesNotifier.notifyAllChannels(wc)
             }
             return true;
         } catch (SocketTimeoutException s) { //repeat read
@@ -71,15 +82,6 @@ public class NetFilter {
             }
             return false;
         }
-    }
-
-    public static void request(webChangesList) {
-        // todo: parralelize me!
-        webChangesList.each{wch-> //WebChange
-            def attempts = 0;
-            while (!makelRequest(wch) || attempts++ < REQUEST_REPEATS_ON_ERRORS);
-        }
-        SqLiteManager.SL.saveWebChangesList(Arrays.asList(webChangesList))
     }
 
     public String html2text(def doc) {

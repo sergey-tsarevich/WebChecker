@@ -157,10 +157,9 @@ class GuiManager {
             }
         }
         // stylish
-        HTMLEditorKit kit = new HTMLEditorKit();
-        StyleSheet styleSheet = kit.getStyleSheet();
-        styleSheet.addRule("html {color:#000; font-family:times; margin: 4px; }");
-        swing.fullTxtPane.editorKit = kit
+        HTMLEditorKit kitFull = new HTMLEditorKit();
+        kitFull.getStyleSheet().addRule("html {background-color:#f2f2f2; font-family:verdana; }");
+        swing.fullTxtPane.editorKit = kitFull
         addLinkHandling(swing.fullTxtPane)
         addLinkHandling(swing.changesPane)
 

@@ -1,7 +1,7 @@
 package info.tss.netassistant.store
 
 import groovy.sql.Sql
-import info.tss.netassistant.AppConstants
+import info.tss.netassistant.AppProps
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteConfig
@@ -39,10 +39,10 @@ public class DbInitializer {
     def sql;
 
     private DbInitializer() {
-        this.dbPath =  System.getProperty(AppConstants.APP_ROOT_PATH) + DB_NAME
-        if (AppConstants.getDbPath()) this.dbPath = AppConstants.getDbPath();
+        this.dbPath =  DB_NAME
+        if (AppProps.getDbPath()) this.dbPath = AppProps.getDbPath();
         initConnection();
-        if (Boolean.valueOf(AppConstants.isDropDb())) this.dropAllTables();
+        if (Boolean.valueOf(AppProps.isDropDb())) this.dropAllTables();
 
         initDataBase();
     }

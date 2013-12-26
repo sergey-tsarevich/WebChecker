@@ -23,7 +23,7 @@ class WebChange {
     @Override
     String toString() {
         if(!viewed && (added_txt || deleted_txt)) {
-            return "<html><font color='blue'>" + this.url + "</font></html>"; // #F88017 - orange
+            return "<html><font color='#F88017'>" + this.url + "</font></html>";
         } else {
             return this.url;
         }

@@ -1,8 +1,7 @@
 package info.tss.netassistant.run
 
-import info.tss.netassistant.AppConstants
+import info.tss.netassistant.AppProps
 import info.tss.netassistant.process.InetViewerJob
-import info.tss.netassistant.process.NetFilter
 import info.tss.netassistant.store.SqLiteManager
 import info.tss.netassistant.ui.GuiManager
 import org.quartz.*
@@ -32,13 +31,8 @@ public class Starter {
     }
 
     public void readConfig() {
-        //read config
-        Properties props = new Properties();
-        InputStream is = getClass().getClassLoader().getResource("config.properties").openStream();
-        BufferedReader utfProps = new BufferedReader(new InputStreamReader(is,"UTF-8"));
-        props.load(utfProps);
-
-        AppConstants.initConfig(props);
+        InputStream is = getClass().getClassLoader().getResource(AppProps.CONF_FILE).openStream();
+        AppProps.initConfig(is);
     }
 
     private void runJobScheduler()  {
@@ -46,10 +40,10 @@ public class Starter {
             SchedulerFactory sf = new StdSchedulerFactory();
             Scheduler sched = sf.getScheduler();
 
-            JobDetail job = JobBuilder.newJob(InetViewerJob.class).withIdentity(AppConstants.INFORMER_JOB_KEY).build();
+            JobDetail job = JobBuilder.newJob(InetViewerJob.class).withIdentity(AppProps.INFORMER_JOB_KEY).build();
             CronTrigger cronTrigger = TriggerBuilder.newTrigger()
                     .withIdentity("cron")
-                    .withSchedule(CronScheduleBuilder.cronSchedule(AppConstants.getViewerCronTrigger()))
+                    .withSchedule(CronScheduleBuilder.cronSchedule(AppProps.getViewerCronTrigger()))
                     .build();
 
             sched.start();
