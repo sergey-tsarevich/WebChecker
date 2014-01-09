@@ -43,9 +43,9 @@ public class EmailChannel implements NotificationChannel {
             message.setFrom(new InternetAddress("from@no-spam.com"));
             message.setRecipients(Message.RecipientType.TO, addresses);
             message.setSubject("Changes of " + w.url);
-            def txtMessage = "<b>Hi!</b> <br/>There are some content was added:<br/>";
+            def txtMessage = "<b>Hi! There are some content was added:</b><br/><hr/>";
             txtMessage += w.added_txt;
-            message.setContent(txtMessage, "text/html")
+            message.setContent(txtMessage, "text/html; charset=\"UTF-8\"")
 
             Transport.send(message);
         } catch (MessagingException e) {

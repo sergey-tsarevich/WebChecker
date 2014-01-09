@@ -1,6 +1,7 @@
 package info.tss.netassistant.process
 
 import info.tss.netassistant.store.SqLiteManager
+import info.tss.netassistant.ui.ViewHelper
 import org.quartz.Job
 import org.quartz.JobExecutionContext
 import org.slf4j.Logger
@@ -18,7 +19,12 @@ public class InetViewerJob implements Job {
     public void execute(JobExecutionContext context) {
         log.info("Starting job...");
 
-        // todo: impl
+        def webChanges = SqLiteManager.SL.getAllWebChanges()
+        webChanges.each {
+            ViewHelper.calcDiffs(it);
+        }
+        NetFilter.requestAndSave(webChanges)
+        // todo: add UI updating
 
         log.info("Ending job...");
     }

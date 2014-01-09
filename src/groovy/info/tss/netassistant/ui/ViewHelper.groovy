@@ -57,8 +57,8 @@ public class ViewHelper {
                         }
                         def endLinkIdx = df.text.indexOf('</a>')
                         if (endLinkIdx >= 0) {
-                            linkNew += df.text.substring(0,endLinkIdx) + '</span></a>'
-                            linkOld += df.text.substring(0,endLinkIdx) + '</span></a>'
+                            linkNew += df.text.substring(0,endLinkIdx) + '</span></a><br>'
+                            linkOld += df.text.substring(0,endLinkIdx) + '</span></a><br>'
 
                             def idx = linkNew.indexOf('>'); // end of <a tag
                             linkNew = linkNew.substring(0, idx+1).replaceAll("\n","") + "<span style='background-color:#b0ffa0'>" + linkNew.substring(idx+1)

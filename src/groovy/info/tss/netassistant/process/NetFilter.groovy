@@ -22,24 +22,29 @@ import java.util.concurrent.TimeUnit
  */
 public class NetFilter {
     public static final String USER_AGENT_HEADER = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36";
-    public static final int DEFAULT_SOCKET_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
-    public static final int REQUEST_REPEATS_ON_ERRORS = 3;
+    public static final int DEFAULT_SOCKET_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
+    public static final int REQUEST_REPEATS_ON_ERRORS = 2;
     public static NetFilter INST = new NetFilter();
     private static Logger log = LoggerFactory.getLogger(NetFilter.class);
     private static final int LINE_WIDTH = 80
-    public static final String UNSUPPORTED_HTML_TAGS = "script,iframe,noscript,object,style"
+    public static final String UNSUPPORTED_HTML_TAGS = "script,iframe,noscript,object,style,meta"
 
-    public static void request(webChangesList) {
+    public static void requestAndSave(webChangesList) {
         // todo: parralelize me!
+        log.info("Start requesting!")
+        def startTime = System.currentTimeMillis()
         webChangesList.each{wch-> //WebChange
             def attempts = 0;
-            while (!makelRequest(wch) || attempts++ < REQUEST_REPEATS_ON_ERRORS);
+            while (!makelRequest(wch) && ++attempts < REQUEST_REPEATS_ON_ERRORS);
         }
+        log.info("Total request time: " + (System.currentTimeMillis() - startTime) / 1000 + " s.")
         SqLiteManager.SL.saveWebChangesList(Arrays.asList(webChangesList))
     }
 
     private static boolean makelRequest(WebChange wc) {
         try {
+            log.info("Request url: $wc.url")
+            def startTime = System.currentTimeMillis()
             def url = ViewHelper.autoCompleteUrl(wc.url)
             Document detailDoc = Jsoup.connect(url).timeout(DEFAULT_SOCKET_TIMEOUT)
                     .userAgent(USER_AGENT_HEADER)
@@ -71,6 +76,7 @@ public class NetFilter {
                 ViewHelper.calcDiffs(wc)
                 ChangesNotifier.notifyAllChannels(wc)
             }
+            log.info("Requesting time: " + (System.currentTimeMillis() - startTime) / 1000 + " s.")
             return true;
         } catch (SocketTimeoutException s) { //repeat read
             log.error("!!!Timeout skip: " + s.message);

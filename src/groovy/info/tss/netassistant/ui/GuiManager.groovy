@@ -15,7 +15,6 @@ import javax.swing.JOptionPane
 import javax.swing.event.HyperlinkEvent
 import javax.swing.event.HyperlinkListener
 import javax.swing.text.html.HTMLEditorKit
-import javax.swing.text.html.StyleSheet
 import java.awt.Desktop
 
 import static java.awt.BorderLayout.*
@@ -27,12 +26,11 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE
  * Date: 01.11.13
  */
 class GuiManager {
-    private static SqLiteManager sqlMan
+    private static SqLiteManager sqlMan = SqLiteManager.SL;
     private static SwingBuilder swing
     private static final Logger log = LoggerFactory.getLogger(GuiManager.class);
 
-    public static void buildUI(SqLiteManager sMan) {
-        sqlMan = sMan; // init
+    public static void buildUI() {
         swing = new SwingBuilder()
 
         DefaultListModel listModel = new DefaultListModel();
@@ -73,7 +71,7 @@ class GuiManager {
                 if (InputValidator.isUrlAvailable(url) ) {
                     def change = new WebChange(url: url, filter: swing.filterFld.text)
                     change.id = sqlMan.createOrUpdateWChange(change);
-                    NetFilter.request([change].toArray())
+                    NetFilter.requestAndSave([change].toArray())
                     showMsg('Added.', 'green')
                     refreshUrlsList()
                 } else {
@@ -97,7 +95,7 @@ class GuiManager {
                 }
                 if (webChanges.every{ !it.viewed && !it.prev_txt}) return JOptionPane.showMessageDialog(null, 'Review selected items first!')
 
-                NetFilter.request(webChanges)
+                NetFilter.requestAndSave(webChanges)
                 refreshUrlsList()
             })
             action(id: 'changeViewed', closure: { e ->

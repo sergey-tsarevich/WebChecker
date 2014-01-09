@@ -19,15 +19,12 @@ public class Starter {
     public static void main(String[] args) {
         // init config and other resources
         new Starter().init();
-        // start first run --> todo: move to job
-//        new NetFilter(SqLiteManager.SL).filterResources();
-
-        GuiManager.buildUI(SqLiteManager.SL);
+        GuiManager.buildUI();
     }
 
     def init(){
         readConfig();
-//        runJobScheduler();
+        runJobScheduler();
     }
 
     public void readConfig() {
