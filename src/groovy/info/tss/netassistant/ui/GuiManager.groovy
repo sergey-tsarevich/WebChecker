@@ -26,22 +26,20 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE
  * Date: 01.11.13
  */
 class GuiManager {
-    private static SqLiteManager sqlMan = SqLiteManager.SL;
-    private static SwingBuilder swing
     private static final Logger log = LoggerFactory.getLogger(GuiManager.class);
+    private static SqLiteManager sqlMan = SqLiteManager.SL;
+    private static SwingBuilder swing = new SwingBuilder()
+    private static DefaultListModel listModel = new DefaultListModel();
+
+    public static void refreshUrlsList() {
+        listModel.clear();
+        sqlMan.getAllWebChanges().each {
+            listModel.addElement(it);
+            ViewHelper.calcDiffs(it);
+        }
+    }
 
     public static void buildUI() {
-        swing = new SwingBuilder()
-
-        DefaultListModel listModel = new DefaultListModel();
-        def refreshUrlsList = {
-            listModel.clear();
-            sqlMan.getAllWebChanges().each {
-                listModel.addElement(it);
-                ViewHelper.calcDiffs(it);
-            }
-        }
-
         def currentWCh = null
         def showMsg = { msg, color ->
             swing.infoLbl.text = "<html><font color='${color}'>${msg}</font></html>";
@@ -71,7 +69,7 @@ class GuiManager {
                 if (InputValidator.isUrlAvailable(url) ) {
                     def change = new WebChange(url: url, filter: swing.filterFld.text)
                     change.id = sqlMan.createOrUpdateWChange(change);
-                    NetFilter.requestAndSave([change].toArray())
+                    NetFilter.requestNotifyAndSave([change].toArray())
                     showMsg('Added.', 'green')
                     refreshUrlsList()
                 } else {
@@ -93,9 +91,9 @@ class GuiManager {
                 } else {
                     webChanges = listModel.toArray()
                 }
-                if (webChanges.every{ !it.viewed && !it.prev_txt}) return JOptionPane.showMessageDialog(null, 'Review selected items first!')
+                if (webChanges.every{ !it.viewed && !it.prev_html}) return JOptionPane.showMessageDialog(null, 'Review selected items first!')
 
-                NetFilter.requestAndSave(webChanges)
+                NetFilter.requestNotifyAndSave(webChanges)
                 refreshUrlsList()
             })
             action(id: 'changeViewed', closure: { e ->

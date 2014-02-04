@@ -1,9 +1,13 @@
 package info.tss.netassistant.process
 
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import groovy.json.StringEscapeUtils
 import info.tss.netassistant.notify.ChangesNotifier
 import info.tss.netassistant.store.SqLiteManager
 import info.tss.netassistant.store.structure.WebChange
 import info.tss.netassistant.ui.ViewHelper
+import org.jsoup.Connection
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -29,13 +33,17 @@ public class NetFilter {
     private static final int LINE_WIDTH = 80
     public static final String UNSUPPORTED_HTML_TAGS = "script,iframe,noscript,object,style,meta"
 
-    public static void requestAndSave(webChangesList) {
+    public static void requestNotifyAndSave(webChangesList) {
         // todo: parralelize me!
         log.info("Start requesting!")
         def startTime = System.currentTimeMillis()
         webChangesList.each{wch-> //WebChange
             def attempts = 0;
-            while (!makelRequest(wch) && ++attempts < REQUEST_REPEATS_ON_ERRORS);
+            try {
+                while (!makelRequest(wch) && ++attempts < REQUEST_REPEATS_ON_ERRORS);
+            } catch(Exception e){
+                log.error("Exception during request $wch.url : ", e);
+            }
         }
         log.info("Total request time: " + (System.currentTimeMillis() - startTime) / 1000 + " s.")
         SqLiteManager.SL.saveWebChangesList(Arrays.asList(webChangesList))
@@ -46,7 +54,7 @@ public class NetFilter {
             log.info("Request url: $wc.url")
             def startTime = System.currentTimeMillis()
             def url = ViewHelper.autoCompleteUrl(wc.url)
-            Document detailDoc = Jsoup.connect(url).timeout(DEFAULT_SOCKET_TIMEOUT)
+            Connection.Response response = Jsoup.connect(url).timeout(DEFAULT_SOCKET_TIMEOUT)
                     .userAgent(USER_AGENT_HEADER)
                     .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
                     .header("Accept-Encoding", "gzip,deflate,sdch")
@@ -54,19 +62,43 @@ public class NetFilter {
                     .header("Cache-Control", "no-cache")
                     .header("DNT", "1")
                     .header("Pragma", "no-cache")
-                    .get();
+                    .ignoreContentType(true).execute();
             def currTxt = ""
             def currHtml = ""
-            detailDoc.select(UNSUPPORTED_HTML_TAGS).remove();
-            if (wc.filter){
-                Elements adAttrs = detailDoc.select(wc.filter);
-                currTxt = INST.html2text(adAttrs)
-                currHtml = adAttrs.outerHtml()
-            } else {
-                currTxt = INST.html2text(detailDoc)
-                currHtml = detailDoc.outerHtml()
+
+            if (response.contentType().trim().indexOf("application/json")==0) { // JSON response
+                JsonSlurper jslurper = new JsonSlurper();
+                def parsedJson =  jslurper.parseText(response.body());
+                if (parsedJson instanceof List && parsedJson.size() > 0 && parsedJson.get(0) instanceof HashMap) {
+                    def str = ""
+                    parsedJson.each { o->
+                        o.each { k, v ->
+                            if (v) str += k + " : " + v + "<br>"
+                        }
+                        str +="<br>"
+                    }
+                    currHtml = str;
+                    currTxt = Jsoup.parse(str).text();
+                } else {
+                    currHtml = currTxt = StringEscapeUtils.unescapeJava(JsonOutput.prettyPrint(response.body()));
+                }
+            } else {        // HTML response
+                Document detailDoc = response.parse();
+                detailDoc.select(UNSUPPORTED_HTML_TAGS).remove();
+                if (wc.filter){
+                    Elements adAttrs = detailDoc.select(wc.filter);
+                    currTxt = INST.html2text(adAttrs)
+                    currHtml = adAttrs.outerHtml()
+                } else {
+                    currTxt = INST.html2text(detailDoc)
+                    currHtml = detailDoc.outerHtml()
+                }
             }
+
             wc.last_check = new Date()
+            if(currTxt) currTxt.trim()
+            if(wc.curr_txt) wc.curr_txt.trim()
+
             if (currTxt && currTxt!=wc.curr_txt) {
                 wc.prev_txt = wc.curr_txt
                 wc.curr_txt = currTxt
