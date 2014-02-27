@@ -12,3 +12,6 @@ informer.log
 # Package Files #
 *.war
 *.ear
+/build
+/bin
+
