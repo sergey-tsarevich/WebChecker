@@ -1,5 +1,6 @@
 package info.tss.netassistant.ui
 
+import info.tss.netassistant.store.structure.Diff
 import info.tss.netassistant.store.structure.WebChange
 import name.fraser.neil.plaintext.diff_match_patch
 
@@ -29,11 +30,11 @@ public class ViewHelper {
      *         [1] << added text
      *         [2] << deleted text
      */
-    static List<String> getColorizedHtml(String prev_txt, String curr_txt){
-        def resultList = []
+    static Diff getColorizedHtml(String prev_txt, String curr_txt){
+        def resultDiff = new Diff();
         if (!prev_txt || !curr_txt) {
-            resultList << curr_txt
-            return resultList
+			resultDiff.fullText = curr_txt
+            return resultDiff
         }
         def var = new diff_match_patch()
         List<diff_match_patch.Diff> diffs = var.diff_main(prev_txt, curr_txt);
@@ -107,20 +108,20 @@ public class ViewHelper {
             }
         }
         fullTxt += "</html>";
-        resultList << fullTxt
-        resultList << addedTxt
-        resultList << delTxt
+        resultDiff.fullText = fullTxt
+        resultDiff.addedText = addedTxt
+        resultDiff.deletedText = delTxt
 
-        return resultList;
+        return resultDiff;
     }
 
     static void calcDiffs(WebChange wch){
         // todo: check if its rendering is ok -> if not use flag to mark to handle html
 //        def resultList = getColorizedHtml(wch.prev_txt, wch.curr_txt)
-        def resultList = getColorizedHtml(wch.prev_html, wch.curr_html)
-        if(resultList[1]) wch.added_txt =resultList[1]
-        if(resultList[2]) wch.deleted_txt = resultList[2]
-        wch.fullTxt = resultList[0]?:"";
+        def resultDiff = getColorizedHtml(wch.prev_html, wch.curr_html)
+        if(resultDiff.addedText) wch.added_txt = resultDiff.addedText
+        if(resultDiff.deletedText) wch.deleted_txt = resultDiff.deletedText
+        wch.fullTxt = resultDiff.fullText ?:"";
     }
 
 
