@@ -25,10 +25,7 @@ public class ViewHelper {
      * Add html colored format to diffs.
      * @param prev_txt - previous text
      * @param curr_txt - current text
-     * @return list of three Strings:
-     *         [0] << full text
-     *         [1] << added text
-     *         [2] << deleted text
+     * @return list of Diff
      */
     static Diff getColorizedHtml(String prev_txt, String curr_txt){
         def resultDiff = new Diff();
@@ -123,9 +120,6 @@ public class ViewHelper {
         if(resultDiff.deletedText) wch.deleted_txt = resultDiff.deletedText
         wch.fullTxt = resultDiff.fullText ?:"";
     }
-
-
-
 
 
 }

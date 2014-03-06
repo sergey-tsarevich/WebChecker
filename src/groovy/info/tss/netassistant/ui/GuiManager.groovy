@@ -18,6 +18,7 @@ import javax.swing.text.html.HTMLEditorKit
 import java.awt.Desktop
 
 import static java.awt.BorderLayout.*
+import static javax.swing.JSplitPane.HORIZONTAL_SPLIT
 import static javax.swing.JSplitPane.VERTICAL_SPLIT
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE
 
@@ -141,10 +142,10 @@ class GuiManager {
                             textPane(id: 'changesPane', contentType: 'text/html')
                         }
                     }
-                    panel {
-                        borderLayout()
-                        list(constraints: WEST, id: 'urlsList', model: listModel, valueChanged: selectAction.closure)
-
+                    splitPane (constraints: CENTER, orientation: HORIZONTAL_SPLIT, dividerLocation: 150){
+						scrollPane(constraints: WEST) {
+							list(id: 'urlsList', model: listModel, valueChanged: selectAction.closure)
+						}
                         scrollPane(constraints: CENTER, border: BorderFactory.createTitledBorder('content: ')) {
                             textPane(id: 'fullTxtPane', contentType: 'text/html')
                         }

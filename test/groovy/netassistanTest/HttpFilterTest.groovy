@@ -6,8 +6,8 @@ import info.tss.netassistant.ui.ViewHelper
 import name.fraser.neil.plaintext.diff_match_patch
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
+import org.jsoup.safety.Whitelist
 
 import java.util.concurrent.TimeUnit
 
@@ -66,14 +66,7 @@ public class HttpFilterTest extends GroovyTestCase {
         assertNotNull(currTxt);
     }
 
-    public void testTmpQueries(){
-        def f = "test/groovy/n.html"
-        Document doc = Jsoup.parse(new File(f), "windows-1251");
-        Elements adAttrs = doc.select("div[style^=width:640px]");
-        adAttrs.select("script,iframe,noscript,object").remove()
-        assertNotNull(adAttrs.outerHtml());
-    }
-	
+
 	// test html comparing
 	public void testEkaterinkaResponse(){
 		String p = new File("test/groovy/diffs/ek_p.html").text;
@@ -83,5 +76,35 @@ public class HttpFilterTest extends GroovyTestCase {
 		println d.addedText
 	}
 	
+	
+    // test html comparing
+    public void testHtmlCleaning(){
+        String p = new File("test/groovy/diffs/ek_p.html").text;
+        String sbafe = Jsoup.clean(p,
+                new Whitelist()
+                        .addTags(
+                        "a", "b", "blockquote", "br", "cite", "code", "dd", "dl", "dt", "em",
+                        "i", "li", "ol", "p", "pre", "q", "small", "strike", "strong", "sub",
+                        "sup", "u", "ul")
+                        .addAttributes("a", "href")
+                        .addAttributes("blockquote", "cite")
+                        .addAttributes("q", "cite")
+//                        .addProtocols("a", "href", "ftp", "http", "https", "mailto")
+                        .addProtocols("blockquote", "cite", "http", "https")
+                        .addProtocols("cite", "cite", "http", "https")
+//                        .addEnforcedAttribute("a", "rel", "nofollow")
+                .addTags("img")
+                .addAttributes("img", "align", "alt", "height", "src", "title", "width")
+                .addProtocols("img", "src", "http", "https"));
+		assertNotNull(safe);
+//        println safe;
+	}
+
+    public void testTmpQueries() {
+        def f = "test/groovy/n.html"
+        Document doc = Jsoup.parse(new File(f), "UTF-8");
+        NetFilter.prefixUrlsWithBase(doc, "http://sobor.by/")
+        println doc.outerHtml()
+    }
 
 }

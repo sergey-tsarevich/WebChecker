@@ -12,6 +12,7 @@ import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.TextNode
+import org.jsoup.safety.Whitelist
 import org.jsoup.select.Elements
 import org.jsoup.select.NodeVisitor
 import org.slf4j.Logger
@@ -32,6 +33,23 @@ public class NetFilter {
     private static Logger log = LoggerFactory.getLogger(NetFilter.class);
     private static final int LINE_WIDTH = 80
     public static final String UNSUPPORTED_HTML_TAGS = "script,iframe,noscript,object,style,meta"
+	public static final Whitelist HTML_CLEANER = new Whitelist()
+                        .addTags(
+                        "a", "b", "blockquote", "br", "cite", "code", "dd", "dl", "dt", "em",
+                        "i", "li", "ol", "p", "pre", "q", "small", "strike", "strong", "sub",
+                        "sup", "u", "ul")
+                        .addAttributes("a", "href")
+                        .addAttributes("blockquote", "cite")
+                        .addAttributes("q", "cite")
+//                        .addProtocols("a", "href", "ftp", "http", "https", "mailto")
+                        .addProtocols("blockquote", "cite", "http", "https")
+                        .addProtocols("cite", "cite", "http", "https")
+//                        .addEnforcedAttribute("a", "rel", "nofollow")
+                .addTags("img")
+                .addAttributes("img", "align", "alt", "height", "src", "title", "width")
+                .addProtocols("img", "src", "http", "https");
+
+	
 
     public static void requestNotifyAndSave(webChangesList) {
         // todo: parralelize me!
@@ -94,16 +112,16 @@ public class NetFilter {
                     currHtml = detailDoc.outerHtml()
                 }
             }
-
+			currHtml = Jsoup.clean(currHtml, HTML_CLEANER);
             wc.last_check = new Date()
             if(currTxt) currTxt.trim()
             if(wc.curr_txt) wc.curr_txt.trim()
 
-            if (currTxt && currTxt!=wc.curr_txt) {
+            if (currTxt && !currTxt.equals(wc.curr_txt)) {
                 wc.prev_txt = wc.curr_txt
                 wc.curr_txt = currTxt
                 wc.prev_html = wc.curr_html
-                wc.curr_html = currHtml
+                wc.curr_html = prefixUrlsWithBase(currHtml)
                 wc.viewed = 0
                 ViewHelper.calcDiffs(wc)
                 ChangesNotifier.notifyAllChannels(wc)
@@ -143,6 +161,18 @@ public class NetFilter {
         });
 
         return resultStr;
+    }
+
+    /*
+     * Prefix all locale links in doc with base url.
+     */
+    public static void  prefixUrlsWithBase(def doc, String base) {
+        base = ViewHelper.autoCompleteUrl(base) + "/";
+        Elements ems = doc.select("a[href~=^\\w+/]"); // select links with local ptath
+        ems.each {
+            String url =  it.attr("href")
+            it.attr("href", base + url)
+        }
     }
 
 }
