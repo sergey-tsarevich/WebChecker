@@ -32,7 +32,12 @@ public class EmailChannel implements NotificationChannel {
         addresses = InternetAddress.parse(AppProps.get("emailTo"));
     }
 
-    /**
+    @Override
+	public Integer getType() {
+		return 2;
+	}
+
+	/**
      * Send email notifications
      */
     @Override

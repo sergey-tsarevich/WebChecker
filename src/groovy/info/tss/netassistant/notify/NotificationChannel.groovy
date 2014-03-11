@@ -10,5 +10,10 @@ import info.tss.netassistant.store.structure.WebChange
 public interface NotificationChannel {
 
     void notify(WebChange w);
+	
+	/*
+	 * Each notification implementation have own code(type)
+	 */
+	Integer getType();
 
 }

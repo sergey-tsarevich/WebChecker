@@ -8,6 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.swing.BorderFactory
+import javax.swing.BoxLayout
 import javax.swing.DefaultListModel
 import javax.swing.ImageIcon
 import javax.swing.JEditorPane
@@ -15,7 +16,9 @@ import javax.swing.JOptionPane
 import javax.swing.event.HyperlinkEvent
 import javax.swing.event.HyperlinkListener
 import javax.swing.text.html.HTMLEditorKit
+import java.awt.BorderLayout
 import java.awt.Desktop
+import java.awt.FlowLayout
 
 import static java.awt.BorderLayout.*
 import static javax.swing.JSplitPane.HORIZONTAL_SPLIT
@@ -97,6 +100,15 @@ class GuiManager {
                 NetFilter.requestNotifyAndSave(webChanges)
                 refreshUrlsList()
             })
+			action(id: 'settingsAction', closure: { e ->
+				def visible = swing.togglePanel.visible;
+				if (visible) {
+					swing.relayoutPanel.layout = new BoxLayout(swing.relayoutPanel, BoxLayout.PAGE_AXIS);
+				} else {
+					swing.relayoutPanel.layout = new FlowLayout();
+				}
+				swing.togglePanel.visible = !visible;
+			})
             action(id: 'changeViewed', closure: { e ->
                 def selected = e.source.selected
                 urlsList.selectedValues.each {
@@ -122,19 +134,37 @@ class GuiManager {
                         panel(constraints: WEST) {
                             borderLayout()
                             label(constraints: NORTH, id: 'infoLbl', text: '')
-                            panel(constraints: CENTER){
-                                borderLayout()
-                                checkBox(constraints: CENTER, id: 'viewedChBox', text: 'Viewed', actionPerformed: changeViewed.closure)
-                                textField(constraints: SOUTH, id: 'filterFld')
+                            panel(constraints: CENTER, id: 'relayoutPanel'){
+								//borderLayout()
+                                checkBox(id: 'viewedChBox', text: 'Viewed', actionPerformed: changeViewed.closure)
+								button('Request', id: 'reqBtn', actionPerformed: reqAction.closure)
+								button('Settings', id: 'settingsBtn', actionPerformed: settingsAction.closure)
                             }
-                            panel(constraints: SOUTH){
+                            panel(constraints: SOUTH, id: 'togglePanel'){
                                 borderLayout()
                                 panel(constraints: NORTH){
-                                    button('Request', id: 'reqBtn', actionPerformed: reqAction.closure)
+									borderLayout()
+									panel(constraints: NORTH, border: BorderFactory.createTitledBorder('filter:')) {
+										borderLayout()
+										textField(constraints: CENTER, id: 'filterFld')
+									}
+									panel(constraints: CENTER, border: BorderFactory.createTitledBorder('period in ms:')) {
+										borderLayout()
+										textField(constraints: CENTER, id: 'periodFld') // todo: make like a filterFld 
+									}
+									
                                 }
                                 panel(constraints: CENTER){
-                                    button('Add', id: 'addBtn', actionPerformed: addAction.closure)
-                                    button('Delete', id: 'delBtn', actionPerformed: delAction.closure)
+									borderLayout()
+									panel(constraints: NORTH, border: BorderFactory.createTitledBorder('notifications:')) {
+										checkBox(id: 'emailChBox', text: 'Email')
+										checkBox(id: 'trayChBox', text: 'Tray')
+										checkBox(id: 'dialogChBox', text: 'Dialog')
+									}
+									panel(constraints: CENTER) {
+	                                    button('Add', id: 'addBtn', actionPerformed: addAction.closure)
+	                                    button('Delete', id: 'delBtn', actionPerformed: delAction.closure)
+									}
                                 }
                             }
                         }

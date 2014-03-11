@@ -16,7 +16,8 @@ class WebChange {
     def deleted_txt  // difference that was deleted
     def prev_html    // previous html to compare
     def curr_html    // current html to compare
-
+    def check_period    // period after which url will be checked
+    def notifications    // comma-separated notification types
 
     def fullTxt      // full colored html for UI only
 

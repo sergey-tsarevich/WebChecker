@@ -1,9 +1,11 @@
 package info.tss.netassistant.notify
 
 import info.tss.netassistant.store.structure.WebChange
+
 import org.jsoup.Jsoup
 
 import javax.swing.*
+
 import java.awt.*
 
 /**
@@ -15,6 +17,11 @@ class SystemTrayChannel implements NotificationChannel {
 
     private TrayIcon trayIcon;
     private Image img = new ImageIcon(this.class.classLoader.getResource('4.png')).image;
+
+	@Override
+	public Integer getType() {
+		return 1;
+	}
 
     @Override
     void notify(WebChange w) {
