@@ -2,6 +2,8 @@ package info.tss.netassistant.notify
 
 import info.tss.netassistant.AppProps
 import info.tss.netassistant.store.structure.WebChange
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.mail.*
 import javax.mail.internet.InternetAddress
@@ -13,6 +15,7 @@ import javax.mail.internet.MimeMessage
  * Date: 3/23/13
  */
 public class EmailChannel implements NotificationChannel {
+    private static Logger log = LoggerFactory.getLogger(EmailChannel.class);
     Properties props = new Properties();
     Authenticator authenticator
     def addresses
@@ -50,8 +53,8 @@ public class EmailChannel implements NotificationChannel {
             message.setContent(txtMessage, "text/html; charset=\"UTF-8\"")
 
             Transport.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.error("Can not notify by email: ", e);
         }
     }
 
