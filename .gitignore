@@ -14,4 +14,9 @@ informer.log
 *.ear
 /build
 /bin
+/out
 
+# eclipse files #
+/.settings
+.classpath
+.project

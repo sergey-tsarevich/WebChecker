@@ -62,8 +62,9 @@ class GuiManager {
                         swing.urlFld.text = w.url?:""
                         swing.filterFld.text = w.filter?:""
                         swing.viewedChBox.selected = w.viewed
-                        swing.fullTxtPane.text = w.fullTxt?:""
-                        if (w.added_txt && !w.viewed) swing.changesPane.text = "<html>" + w.added_txt.split("\b").join("<hr><br>") + "</html>"
+                        swing.fullTxtPane.text = "<html><div  style=\"margin:20px 40px;\">" + (w.fullTxt?:"") + "</div></html>"
+                        if (w.added_txt && !w.viewed)
+                            swing.changesPane.text = "<html><div  style=\"margin: 20px 40px;\">" + w.added_txt.split("\b").join("<hr><br>") + "</div></html>"
                         else swing.changesPane.text = ""
                     };
                 }

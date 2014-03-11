@@ -121,7 +121,7 @@ public class NetFilter {
                 wc.prev_txt = wc.curr_txt
                 wc.curr_txt = currTxt
                 wc.prev_html = wc.curr_html
-                wc.curr_html = prefixUrlsWithBase(currHtml)
+                wc.curr_html = prefixUrlsWithBase(currHtml, wc.url)
                 wc.viewed = 0
                 ViewHelper.calcDiffs(wc)
                 ChangesNotifier.notifyAllChannels(wc)
@@ -164,15 +164,20 @@ public class NetFilter {
     }
 
     /*
-     * Prefix all locale links in doc with base url.
+     * Prefix all locale links in docHtml with base url.
+     * @return html with absolute urls in links
      */
-    public static void  prefixUrlsWithBase(def doc, String base) {
-        base = ViewHelper.autoCompleteUrl(base) + "/";
-        Elements ems = doc.select("a[href~=^\\w+/]"); // select links with local ptath
+    public static String  prefixUrlsWithBase(String docHtml, String base) {
+        Document doc = Jsoup.parse(docHtml, "UTF-8");
+        base = ViewHelper.autoCompleteUrl(base);
+        Elements ems = doc.select("a[href~=^[\\/]?\\w+/]"); // select links with local patch
         ems.each {
-            String url =  it.attr("href")
-            it.attr("href", base + url)
+            String url =  it.attr("href");
+			String fullUrl = base + (base.endsWith("/") || url.startsWith("/") ? "": "/" ) + url
+            it.attr("href", fullUrl)
         }
+
+        return doc.outerHtml();
     }
 
 }

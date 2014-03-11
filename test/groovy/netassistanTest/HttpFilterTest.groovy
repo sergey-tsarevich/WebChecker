@@ -73,7 +73,6 @@ public class HttpFilterTest extends GroovyTestCase {
 		String c = new File("test/groovy/diffs/ek_c.html").text;
 		Diff d = ViewHelper.getColorizedHtml(p,c);
 //		println d.fullText
-		println d.addedText
 	}
 	
 	
@@ -101,10 +100,15 @@ public class HttpFilterTest extends GroovyTestCase {
 	}
 
     public void testTmpQueries() {
-        def f = "test/groovy/n.html"
-        Document doc = Jsoup.parse(new File(f), "UTF-8");
-        NetFilter.prefixUrlsWithBase(doc, "http://sobor.by/")
-        println doc.outerHtml()
+        def testHtml = """
+        <a href="page/Tyopliy_dom_ishchet_mamu_i_papu_dlya_5_h_detey"><span style='background-color:#b0ffa0'>&laquo;Тёплый дом&raquo; ищет маму и папу для 5-х детей</span></a><br>
+        <a href="/page/Pravoslavniy_advokat_okazivaet_yuridicheskie_uslugi"><span style='background-color:#b0ffa0'>Православный адвокат оказывает юридические услуги</span></a><br>
+        <a href="www.hram.page/Trebuetsya_pomoshch"><span style='background-color:#b0ffa0'>Требуется помощь</span></a><br>
+        <a href="http://sdf.sdf/page/Raspisanie_bogoslugeniy_adresa_i_telefoni_hramov_Minska"><span style='background-color:#b0ffa0'>Расписание богослужений, адреса и телефоны храмов Минска</span></a><br>
+        <a href="page/Moleben_pered_rogdeniem_rebyonka_budet_sovershatsya_po_pyatnitsam_v_Svyato_Tatyaninskom_hrame"><span style='background-color:#b0ffa0'>Молебен перед рождением ребёнка будет совершатся по пятницам в Свято-Татьянинском храме</span></a><br>
+        """
+
+        println NetFilter.prefixUrlsWithBase(testHtml, "http://sobor.by/")
     }
 
 }
