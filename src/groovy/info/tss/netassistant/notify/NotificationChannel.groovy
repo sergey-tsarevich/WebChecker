@@ -14,6 +14,6 @@ public interface NotificationChannel {
 	/*
 	 * Each notification implementation have own code(type)
 	 */
-	Integer getType();
+	String getType();
 
 }

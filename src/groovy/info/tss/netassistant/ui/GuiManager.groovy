@@ -4,6 +4,10 @@ import groovy.swing.SwingBuilder
 import info.tss.netassistant.process.NetFilter
 import info.tss.netassistant.store.SqLiteManager
 import info.tss.netassistant.store.structure.WebChange
+import info.tss.netassistant.notify.EmailChannel
+import info.tss.netassistant.notify.SystemTrayChannel
+import info.tss.netassistant.notify.JDialogChannel
+
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -50,6 +54,15 @@ class GuiManager {
             new Timer().runAfter(5000) { swing.infoLbl.text = "" }
         }
 
+		def getNotificationsList = { swing ->
+			def notifications = "";
+			notifications += swing['notifyChBox_' + EmailChannel.TYPE].selected ? ",1" : ""
+			notifications += swing['notifyChBox_' + SystemTrayChannel.TYPE].selected ? ",2" : ""
+			notifications += swing['notifyChBox_' + JDialogChannel.TYPE].selected ? ",3" : ""
+			if(notifications) notifications = notifications -1;
+			return notifications
+		}
+
         refreshUrlsList()
 
         swing.actions() {
@@ -59,8 +72,16 @@ class GuiManager {
                     WebChange w = l.selectedValue
                     if (w) { // can be null on multi selection
                         currentWCh = w
+						
+						swing['notifyChBox_' + EmailChannel.TYPE].selected = false
+						swing['notifyChBox_' + SystemTrayChannel.TYPE].selected = false
+						swing['notifyChBox_' + JDialogChannel.TYPE].selected = false
+						w.notifications.split(",").each{
+							swing['notifyChBox_' + it].selected = true;
+						}
                         swing.urlFld.text = w.url?:""
                         swing.filterFld.text = w.filter?:""
+						swing.periodFld.text = w.check_period?:""
                         swing.viewedChBox.selected = w.viewed
                         swing.fullTxtPane.text = "<html><div  style=\"margin:20px 40px;\">" + (w.fullTxt?:"") + "</div></html>"
                         if (w.added_txt && !w.viewed)
@@ -72,7 +93,7 @@ class GuiManager {
             action(id: 'addAction', closure: { e ->
                 def url = swing.urlFld.text;
                 if (InputValidator.isUrlAvailable(url) ) {
-                    def change = new WebChange(url: url, filter: swing.filterFld.text)
+                    def change = new WebChange(url: url, filter: swing.filterFld.text, check_period: swing.periodFld.text)
                     change.id = sqlMan.createOrUpdateWChange(change);
                     NetFilter.requestNotifyAndSave([change].toArray())
                     showMsg('Added.', 'green')
@@ -119,6 +140,13 @@ class GuiManager {
                     it.added_txt = ""
                 }
             })
+			action(id: 'notificationCheck', closure: { e ->
+				def selected = e.source.selected
+				urlsList.selectedValues.each {
+					it.notifications = getNotificationsList(swing);
+					sqlMan.createOrUpdateWChange(it);
+				}
+			})
         }
 
         def frame = swing.frame(title: '<44>', size: [640, 480], defaultCloseOperation: EXIT_ON_CLOSE, show: true,
@@ -136,7 +164,6 @@ class GuiManager {
                             borderLayout()
                             label(constraints: NORTH, id: 'infoLbl', text: '')
                             panel(constraints: CENTER, id: 'relayoutPanel'){
-								//borderLayout()
                                 checkBox(id: 'viewedChBox', text: 'Viewed', actionPerformed: changeViewed.closure)
 								button('Request', id: 'reqBtn', actionPerformed: reqAction.closure)
 								button('Settings', id: 'settingsBtn', actionPerformed: settingsAction.closure)
@@ -151,16 +178,16 @@ class GuiManager {
 									}
 									panel(constraints: CENTER, border: BorderFactory.createTitledBorder('period in ms:')) {
 										borderLayout()
-										textField(constraints: CENTER, id: 'periodFld') // todo: make like a filterFld 
+										textField(constraints: CENTER, id: 'periodFld') 
 									}
 									
                                 }
                                 panel(constraints: CENTER){
 									borderLayout()
 									panel(constraints: NORTH, border: BorderFactory.createTitledBorder('notifications:')) {
-										checkBox(id: 'emailChBox', text: 'Email')
-										checkBox(id: 'trayChBox', text: 'Tray')
-										checkBox(id: 'dialogChBox', text: 'Dialog')
+										checkBox(id: 'notifyChBox_'+ EmailChannel.TYPE, text: 'Email', actionPerformed: notificationCheck.closure)
+										checkBox(id: 'notifyChBox_'+ SystemTrayChannel.TYPE, text: 'Tray', actionPerformed: notificationCheck.closure)
+										checkBox(id: 'notifyChBox_'+ JDialogChannel.TYPE, text: 'Dialog', actionPerformed: notificationCheck.closure)
 									}
 									panel(constraints: CENTER) {
 	                                    button('Add', id: 'addBtn', actionPerformed: addAction.closure)

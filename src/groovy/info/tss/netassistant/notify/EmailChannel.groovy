@@ -19,6 +19,7 @@ public class EmailChannel implements NotificationChannel {
     Properties props = new Properties();
     Authenticator authenticator
     def addresses
+	public static String TYPE = "2"; 
 
     EmailChannel() {
         props.put("mail.smtp.host", AppProps.get("smtpHost"));
@@ -36,8 +37,8 @@ public class EmailChannel implements NotificationChannel {
     }
 
     @Override
-	public Integer getType() {
-		return 2;
+	public String getType() {
+		return TYPE;
 	}
 
 	/**

@@ -17,10 +17,12 @@ class SystemTrayChannel implements NotificationChannel {
 
     private TrayIcon trayIcon;
     private Image img = new ImageIcon(this.class.classLoader.getResource('4.png')).image;
-
+	
+	public static String TYPE = "1";
+	
 	@Override
-	public Integer getType() {
-		return 1;
+	public String getType() {
+		return TYPE;
 	}
 
     @Override

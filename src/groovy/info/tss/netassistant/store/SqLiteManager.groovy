@@ -32,14 +32,14 @@ public class SqLiteManager {
     // @return id of inserted or updated row
     def int createOrUpdateWChange(WebChange wCh){
         def query = ""
-        def params = [wCh.url, wCh.filter, wCh.last_check, wCh.prev_txt, wCh.curr_txt, wCh.viewed, wCh.added_txt, wCh.deleted_txt, wCh.prev_html, wCh.curr_html]
+        def params = [wCh.url, wCh.filter, wCh.last_check, wCh.prev_txt, wCh.curr_txt, wCh.viewed, wCh.added_txt, wCh.deleted_txt, wCh.prev_html, wCh.curr_html, wCh.check_period, wCh.curr_html]
         if (wCh.id) { // update
-            query = "update WEB_CHANGE set url=?, filter=?, last_check=?, prev_txt=?, curr_txt=?, viewed=?, added_txt=?, deleted_txt=?, prev_html=?, curr_html=? where id=?"
+            query = "update WEB_CHANGE set url=?, filter=?, last_check=?, prev_txt=?, curr_txt=?, viewed=?, added_txt=?, deleted_txt=?, prev_html=?, curr_html=?, check_period=?, notifications=?  where id=?"
             params << wCh.id
             sql.executeUpdate(query, params);
             return wCh.id;
         } else { //insert
-            query = "INSERT INTO WEB_CHANGE (url, filter, last_check, prev_txt, curr_txt, viewed, added_txt, deleted_txt, prev_html, curr_html) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            query = "INSERT INTO WEB_CHANGE (url, filter, last_check, prev_txt, curr_txt, viewed, added_txt, deleted_txt, prev_html, curr_html, check_period, notifications) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)"
             return sql.executeInsert(query, params)[0][0];
         }
     }
@@ -56,9 +56,9 @@ public class SqLiteManager {
     def saveWebChangesList(List<WebChange> changes){
         if(!changes) return;
         def startTime = System.currentTimeMillis()
-        sql.withBatch("""update $WEB_CHANGE_TABLE set last_check=?, filter=?, prev_txt=?, curr_txt=?, added_txt=?, deleted_txt=?, viewed=?, prev_html=?, curr_html=? where id=? """) { ps ->
+        sql.withBatch("""update $WEB_CHANGE_TABLE set last_check=?, filter=?, prev_txt=?, curr_txt=?, added_txt=?, deleted_txt=?, viewed=?, prev_html=?, curr_html=?, check_period=?, notifications=? where id=? """) { ps ->
             changes.each{wch->
-                ps.addBatch([wch.last_check, wch.filter, wch.prev_txt, wch.curr_txt, wch.added_txt, wch.deleted_txt, wch.viewed, wch.prev_html, wch.curr_html, wch.id])
+                ps.addBatch([wch.last_check, wch.filter, wch.prev_txt, wch.curr_txt, wch.added_txt, wch.deleted_txt, wch.viewed, wch.prev_html, wch.curr_html, wch.check_period, wch.notifications, wch.id])
             }
         }
 
