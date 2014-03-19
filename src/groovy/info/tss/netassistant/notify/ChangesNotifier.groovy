@@ -18,7 +18,7 @@ class ChangesNotifier {
 
     public static void notifyAllChannels(WebChange wch) {
         for (NotificationChannel ch : channels) {
-            if (wch.notifications.split(",").contains(ch.type)) {
+            if (wch.notifications && wch.notifications.split(",").contains(ch.type)) {
 				ch.notify();
 			}
         }

@@ -32,7 +32,7 @@ public class SqLiteManager {
     // @return id of inserted or updated row
     def int createOrUpdateWChange(WebChange wCh){
         def query = ""
-        def params = [wCh.url, wCh.filter, wCh.last_check, wCh.prev_txt, wCh.curr_txt, wCh.viewed, wCh.added_txt, wCh.deleted_txt, wCh.prev_html, wCh.curr_html, wCh.check_period, wCh.curr_html]
+        def params = [wCh.url, wCh.filter, wCh.last_check, wCh.prev_txt, wCh.curr_txt, wCh.viewed, wCh.added_txt, wCh.deleted_txt, wCh.prev_html, wCh.curr_html, wCh.check_period, wCh.notifications]
         if (wCh.id) { // update
             query = "update WEB_CHANGE set url=?, filter=?, last_check=?, prev_txt=?, curr_txt=?, viewed=?, added_txt=?, deleted_txt=?, prev_html=?, curr_html=?, check_period=?, notifications=?  where id=?"
             params << wCh.id

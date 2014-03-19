@@ -52,22 +52,15 @@ public class NetFilter {
 	
 
     public static void requestNotifyAndSave(webChangesList) {
-        // todo: parralelize me!
         log.info("Start requesting!")
         def startTime = System.currentTimeMillis()
         webChangesList.each{wch-> //WebChange
-            def attempts = 0;
-            try {
-                while (!makelRequest(wch) && ++attempts < REQUEST_REPEATS_ON_ERRORS);
-            } catch(Exception e){
-                log.error("Exception during request $wch.url : ", e);
-            }
+			RequestThread.startFor(wch);
         }
         log.info("Total request time: " + (System.currentTimeMillis() - startTime) / 1000 + " s.")
-        SqLiteManager.SL.saveWebChangesList(Arrays.asList(webChangesList))
     }
 
-    private static boolean makelRequest(WebChange wc) {
+    public static boolean makelRequest(WebChange wc) {
         try {
             log.info("Request url: $wc.url")
             def startTime = System.currentTimeMillis()

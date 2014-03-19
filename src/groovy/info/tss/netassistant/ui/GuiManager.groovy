@@ -76,8 +76,8 @@ class GuiManager {
 						swing['notifyChBox_' + EmailChannel.TYPE].selected = false
 						swing['notifyChBox_' + SystemTrayChannel.TYPE].selected = false
 						swing['notifyChBox_' + JDialogChannel.TYPE].selected = false
-						w.notifications.split(",").each{
-							swing['notifyChBox_' + it].selected = true;
+						w.notifications?.split(",").each{ns->
+							if(ns) swing['notifyChBox_' + ns].selected = true;
 						}
                         swing.urlFld.text = w.url?:""
                         swing.filterFld.text = w.filter?:""

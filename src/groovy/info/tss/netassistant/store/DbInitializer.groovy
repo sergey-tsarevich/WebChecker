@@ -28,8 +28,8 @@ public class DbInitializer {
             viewed INTEGER default 0,   -- 0 and 1 - if change(s) was viewed
             added_txt TEXT,             -- difference that was added
     		deleted_txt TEXT,           -- difference that was deleted
-    		check_period INTEGER,       -- check period
-            notifications TEXT          -- comma separated notifications types
+    		check_period INTEGER default 86400000, -- check period (default one day)
+            notifications TEXT default '1,2' -- comma separated notifications types
         );
     """
 
