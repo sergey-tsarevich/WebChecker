@@ -116,8 +116,8 @@ public class ViewHelper {
         // todo: check if its rendering is ok -> if not use flag to mark to handle html
 //        def resultList = getColorizedHtml(wch.prev_txt, wch.curr_txt)
         def resultDiff = getColorizedHtml(wch.prev_html, wch.curr_html)
-        if(resultDiff.addedText) wch.added_txt = resultDiff.addedText
-        if(resultDiff.deletedText) wch.deleted_txt = resultDiff.deletedText
+        if(resultDiff.addedText) wch.added_txt += GuiManager.CHANGED_TEXT_SEPARATOR + resultDiff.addedText
+        if(resultDiff.deletedText) wch.deleted_txt += GuiManager.CHANGED_TEXT_SEPARATOR + resultDiff.deletedText
         wch.fullTxt = resultDiff.fullText ?:"";
     }
 

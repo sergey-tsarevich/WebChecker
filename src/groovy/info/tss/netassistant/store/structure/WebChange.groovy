@@ -8,7 +8,7 @@ class WebChange {
     def id
     def url                      // url to check for changes
     def filter                   // CSS or jquery-like selector syntax
-    def last_check = new Date()  // time of last check
+    def last_check = new Date().time  // time of last check
     def prev_txt     // previous (html)text to compare
     def curr_txt     // current (html)text to compare
     def viewed = 0   // 0 and 1 - if change(s) was viewed

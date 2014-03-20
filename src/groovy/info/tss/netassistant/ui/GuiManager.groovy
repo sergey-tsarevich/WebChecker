@@ -39,7 +39,9 @@ class GuiManager {
     private static SwingBuilder swing = new SwingBuilder()
     private static DefaultListModel listModel = new DefaultListModel();
 
-    public static void refreshUrlsList() {
+	public static String CHANGED_TEXT_SEPARATOR = "\b";
+	
+	public static void refreshUrlsList() {
         listModel.clear();
         sqlMan.getAllWebChanges().each {
             listModel.addElement(it);
@@ -56,10 +58,10 @@ class GuiManager {
 
 		def getNotificationsList = { swing ->
 			def notifications = "";
-			notifications += swing['notifyChBox_' + EmailChannel.TYPE].selected ? ",1" : ""
-			notifications += swing['notifyChBox_' + SystemTrayChannel.TYPE].selected ? ",2" : ""
-			notifications += swing['notifyChBox_' + JDialogChannel.TYPE].selected ? ",3" : ""
-			if(notifications) notifications = notifications -1;
+			notifications += swing['notifyChBox_' + SystemTrayChannel.TYPE].selected ? "," + SystemTrayChannel.TYPE : ""
+			notifications += swing['notifyChBox_' + EmailChannel.TYPE].selected ? "," + EmailChannel.TYPE : ""
+			notifications += swing['notifyChBox_' + JDialogChannel.TYPE].selected ? "," + JDialogChannel.TYPE : ""
+			if (notifications) notifications = notifications -',';
 			return notifications
 		}
 
@@ -85,7 +87,7 @@ class GuiManager {
                         swing.viewedChBox.selected = w.viewed
                         swing.fullTxtPane.text = "<html><div  style=\"margin:20px 40px;\">" + (w.fullTxt?:"") + "</div></html>"
                         if (w.added_txt && !w.viewed)
-                            swing.changesPane.text = "<html><div  style=\"margin: 20px 40px;\">" + w.added_txt.split("\b").join("<hr><br>") + "</div></html>"
+                            swing.changesPane.text = "<html><div  style=\"margin: 20px 40px;\">" + w.added_txt.split(CHANGED_TEXT_SEPARATOR).join("<hr><br>") + "</div></html>"
                         else swing.changesPane.text = ""
                     };
                 }
@@ -93,7 +95,7 @@ class GuiManager {
             action(id: 'addAction', closure: { e ->
                 def url = swing.urlFld.text;
                 if (InputValidator.isUrlAvailable(url) ) {
-                    def change = new WebChange(url: url, filter: swing.filterFld.text, check_period: swing.periodFld.text)
+                    def change = new WebChange(url: url, filter: swing.filterFld.text, check_period: swing.periodFld.text, notifications: getNotificationsList(swing))
                     change.id = sqlMan.createOrUpdateWChange(change);
                     NetFilter.requestNotifyAndSave([change].toArray())
                     showMsg('Added.', 'green')
@@ -117,7 +119,6 @@ class GuiManager {
                 } else {
                     webChanges = listModel.toArray()
                 }
-                if (webChanges.every{ !it.viewed && !it.prev_html}) return JOptionPane.showMessageDialog(null, 'Review selected items first!')
 
                 NetFilter.requestNotifyAndSave(webChanges)
                 refreshUrlsList()

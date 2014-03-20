@@ -54,9 +54,13 @@ public class NetFilter {
     public static void requestNotifyAndSave(webChangesList) {
         log.info("Start requesting!")
         def startTime = System.currentTimeMillis()
+		def threads = []
         webChangesList.each{wch-> //WebChange
-			RequestThread.startFor(wch);
+			threads << RequestThread.startFor(wch);
         }
+		threads.each{t->
+			if(t) t.join();
+		}
         log.info("Total request time: " + (System.currentTimeMillis() - startTime) / 1000 + " s.")
     }
 
@@ -106,7 +110,7 @@ public class NetFilter {
                 }
             }
 			currHtml = Jsoup.clean(currHtml, HTML_CLEANER);
-            wc.last_check = new Date()
+            wc.last_check = new Date().time
             if(currTxt) currTxt.trim()
             if(wc.curr_txt) wc.curr_txt.trim()
 
