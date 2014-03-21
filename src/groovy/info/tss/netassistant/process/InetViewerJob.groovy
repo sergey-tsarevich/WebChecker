@@ -20,7 +20,7 @@ public class InetViewerJob implements Job {
         log.info("Starting job...");
 
         def webChanges = SqLiteManager.SL.getAllWebChanges()
-        NetFilter.requestNotifyAndSave(webChanges)
+        NetFilter.requestNotifyAndSave(webChanges, false)
         GuiManager.refreshUrlsList();
 
         log.info("Ending job...");

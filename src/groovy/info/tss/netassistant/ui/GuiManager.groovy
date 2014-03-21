@@ -20,7 +20,6 @@ import javax.swing.JOptionPane
 import javax.swing.event.HyperlinkEvent
 import javax.swing.event.HyperlinkListener
 import javax.swing.text.html.HTMLEditorKit
-import java.awt.BorderLayout
 import java.awt.Desktop
 import java.awt.FlowLayout
 
@@ -45,7 +44,7 @@ class GuiManager {
         listModel.clear();
         sqlMan.getAllWebChanges().each {
             listModel.addElement(it);
-            ViewHelper.calcDiffs(it);
+            ViewHelper.calcDiffs(it, true);
         }
     }
 
@@ -87,7 +86,8 @@ class GuiManager {
                         swing.viewedChBox.selected = w.viewed
                         swing.fullTxtPane.text = "<html><div  style=\"margin:20px 40px;\">" + (w.fullTxt?:"") + "</div></html>"
                         if (w.added_txt && !w.viewed)
-                            swing.changesPane.text = "<html><div  style=\"margin: 20px 40px;\">" + w.added_txt.split(CHANGED_TEXT_SEPARATOR).join("<hr><br>") + "</div></html>"
+                            swing.changesPane.text = "<html><div  style=\"margin: 20px 40px;\">" +
+                                    w.added_txt.split(CHANGED_TEXT_SEPARATOR).findAll{it}.join("<hr><br>") + "</div></html>"
                         else swing.changesPane.text = ""
                     };
                 }
@@ -97,7 +97,7 @@ class GuiManager {
                 if (InputValidator.isUrlAvailable(url) ) {
                     def change = new WebChange(url: url, filter: swing.filterFld.text, check_period: swing.periodFld.text, notifications: getNotificationsList(swing))
                     change.id = sqlMan.createOrUpdateWChange(change);
-                    NetFilter.requestNotifyAndSave([change].toArray())
+                    NetFilter.requestNotifyAndSave([change].toArray(), true)
                     showMsg('Added.', 'green')
                     refreshUrlsList()
                 } else {
@@ -120,7 +120,7 @@ class GuiManager {
                     webChanges = listModel.toArray()
                 }
 
-                NetFilter.requestNotifyAndSave(webChanges)
+                NetFilter.requestNotifyAndSave(webChanges, true)
                 refreshUrlsList()
             })
 			action(id: 'settingsAction', closure: { e ->

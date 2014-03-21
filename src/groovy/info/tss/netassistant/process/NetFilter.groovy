@@ -4,7 +4,6 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.json.StringEscapeUtils
 import info.tss.netassistant.notify.ChangesNotifier
-import info.tss.netassistant.store.SqLiteManager
 import info.tss.netassistant.store.structure.WebChange
 import info.tss.netassistant.ui.ViewHelper
 import org.jsoup.Connection
@@ -51,12 +50,12 @@ public class NetFilter {
 
 	
 
-    public static void requestNotifyAndSave(webChangesList) {
+    public static void requestNotifyAndSave(def webChangesList, boolean forceRequest) {
         log.info("Start requesting!")
         def startTime = System.currentTimeMillis()
 		def threads = []
         webChangesList.each{wch-> //WebChange
-			threads << RequestThread.startFor(wch);
+			threads << RequestThread.startFor(wch, forceRequest);
         }
 		threads.each{t->
 			if(t) t.join();
@@ -102,17 +101,17 @@ public class NetFilter {
                 detailDoc.select(UNSUPPORTED_HTML_TAGS).remove();
                 if (wc.filter){
                     Elements adAttrs = detailDoc.select(wc.filter);
-                    currTxt = INST.html2text(adAttrs)
+                    currTxt = adAttrs.text()
                     currHtml = adAttrs.outerHtml()
                 } else {
-                    currTxt = INST.html2text(detailDoc)
+                    currTxt = detailDoc.text()
                     currHtml = detailDoc.outerHtml()
                 }
             }
 			currHtml = Jsoup.clean(currHtml, HTML_CLEANER);
             wc.last_check = new Date().time
-            if(currTxt) currTxt.trim()
-            if(wc.curr_txt) wc.curr_txt.trim()
+            if(currTxt) currTxt = currTxt.trim()
+            if(wc.curr_txt) wc.curr_txt = wc.curr_txt.trim()
 
             if (currTxt && !currTxt.equals(wc.curr_txt)) {
                 wc.prev_txt = wc.curr_txt
@@ -120,9 +119,9 @@ public class NetFilter {
                 wc.prev_html = wc.curr_html
                 wc.curr_html = prefixUrlsWithBase(currHtml, wc.url)
                 wc.viewed = 0
-                ViewHelper.calcDiffs(wc)
+                ViewHelper.calcDiffs(wc, false)
                 ChangesNotifier.notifyAllChannels(wc)
-            }
+            } 
             log.info("Requesting time: " + (System.currentTimeMillis() - startTime) / 1000 + " s.")
             return true;
         } catch (SocketTimeoutException s) { //repeat read
@@ -137,6 +136,7 @@ public class NetFilter {
         }
     }
 
+    // FIX ME: write appropriate unit tests!!!
     public String html2text(def doc) {
         def resultStr = ""
         doc.traverse(new NodeVisitor() {

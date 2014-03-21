@@ -35,6 +35,6 @@ class SystemTrayChannel implements NotificationChannel {
                     })
             SystemTray.getSystemTray().add(trayIcon);
         }
-        trayIcon.displayMessage(w.url + " updated!", Jsoup.parse(w.added_txt).text(), TrayIcon.MessageType.INFO)
+        trayIcon.displayMessage(w.url + " updated!", Jsoup.parse(w.added_txt)?.text(), TrayIcon.MessageType.INFO)
     }
 }

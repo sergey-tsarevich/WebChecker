@@ -112,13 +112,14 @@ public class ViewHelper {
         return resultDiff;
     }
 
-    static void calcDiffs(WebChange wch){
+    static void calcDiffs(WebChange wch, boolean onlyFull){
         // todo: check if its rendering is ok -> if not use flag to mark to handle html
 //        def resultList = getColorizedHtml(wch.prev_txt, wch.curr_txt)
         def resultDiff = getColorizedHtml(wch.prev_html, wch.curr_html)
+        wch.fullTxt = resultDiff.fullText ?:"";
+        if (onlyFull) return;
         if(resultDiff.addedText) wch.added_txt += GuiManager.CHANGED_TEXT_SEPARATOR + resultDiff.addedText
         if(resultDiff.deletedText) wch.deleted_txt += GuiManager.CHANGED_TEXT_SEPARATOR + resultDiff.deletedText
-        wch.fullTxt = resultDiff.fullText ?:"";
     }
 
 

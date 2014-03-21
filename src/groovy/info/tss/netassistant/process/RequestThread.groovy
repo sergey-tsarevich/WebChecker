@@ -27,8 +27,9 @@ class RequestThread implements Runnable {
 		}
 	}	
 	
-	public static Thread startFor(WebChange wch){
-		if (!wch.check_period || !wch.last_check || ((new Date().time - wch.last_check) > wch.check_period.toLong())) {
+	public static Thread startFor(WebChange wch, boolean forceRequest){
+		if (forceRequest || !wch.check_period || !wch.last_check ||
+                ((new Date().time - wch.last_check) > wch.check_period.toLong())) {
 			RequestThread rt = new RequestThread(wch);
 			Thread thread = new Thread(rt);
 			thread.start();

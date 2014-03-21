@@ -36,12 +36,14 @@ public class SqLiteManager {
         if (wCh.id) { // update
             query = "update WEB_CHANGE set url=?, filter=?, last_check=?, prev_txt=?, curr_txt=?, viewed=?, added_txt=?, deleted_txt=?, prev_html=?, curr_html=?, check_period=?, notifications=?  where id=?"
             params << wCh.id
-			log.info("Updating $wCh.url with notifications: $wCh.notifications")
             sql.executeUpdate(query, params);
+			log.info("Updating $wCh.url with notifications: $wCh.notifications")
             return wCh.id;
         } else { //insert
             query = "INSERT INTO WEB_CHANGE (url, filter, last_check, prev_txt, curr_txt, viewed, added_txt, deleted_txt, prev_html, curr_html, check_period, notifications) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)"
-            return sql.executeInsert(query, params)[0][0];
+			int resultId = sql.executeInsert(query, params)[0][0]; 
+			log.info("Inserting $wCh.url with notifications: $wCh.notifications")
+            return resultId;
         }
     }
 
