@@ -79,7 +79,7 @@ public class HttpFilterTest extends GroovyTestCase {
     // test html comparing
     public void testHtmlCleaning(){
         String p = new File("test/groovy/diffs/ek_p.html").text;
-        String sbafe = Jsoup.clean(p,
+        String safe = Jsoup.clean(p,
                 new Whitelist()
                         .addTags(
                         "a", "b", "blockquote", "br", "cite", "code", "dd", "dl", "dt", "em",

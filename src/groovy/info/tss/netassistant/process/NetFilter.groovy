@@ -4,8 +4,10 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.json.StringEscapeUtils
 import info.tss.netassistant.notify.ChangesNotifier
+import info.tss.netassistant.store.SqLiteManager;
 import info.tss.netassistant.store.structure.WebChange
 import info.tss.netassistant.ui.ViewHelper
+
 import org.jsoup.Connection
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
@@ -53,13 +55,20 @@ public class NetFilter {
     public static void requestNotifyAndSave(def webChangesList, boolean forceRequest) {
         log.info("Start requesting!")
         def startTime = System.currentTimeMillis()
-		def threads = []
         webChangesList.each{wch-> //WebChange
-			threads << RequestThread.startFor(wch, forceRequest);
+        	// threads << RequestThread.startFor(wch, forceRequest);
+			if (forceRequest || !wch.check_period || !wch.last_check ||
+	                ((new Date().time - wch.last_check) > wch.check_period.toLong())) {
+					def attempts = 0;
+					try {
+						while (!NetFilter.makelRequest(wch) && ++attempts < NetFilter.REQUEST_REPEATS_ON_ERRORS);
+						SqLiteManager.SL.createOrUpdateWChange(wch);
+					} catch(Exception e){
+						log.error("Exception during request $wch.url : ", e);
+					}
+			}
+
         }
-		threads.each{t->
-			if(t) t.join();
-		}
         log.info("Total request time: " + (System.currentTimeMillis() - startTime) / 1000 + " s.")
     }
 
@@ -80,7 +89,7 @@ public class NetFilter {
             def currTxt = ""
             def currHtml = ""
 
-            if (response.contentType().trim().indexOf("application/json")==0) { // JSON response
+            if (response.contentType()?.trim()?.indexOf("application/json")==0) { // JSON response
                 JsonSlurper jslurper = new JsonSlurper();
                 def parsedJson =  jslurper.parseText(response.body());
                 if (parsedJson instanceof List && parsedJson.size() > 0 && parsedJson.get(0) instanceof HashMap) {
@@ -120,7 +129,7 @@ public class NetFilter {
                 wc.curr_html = prefixUrlsWithBase(currHtml, wc.url)
                 wc.viewed = 0
                 ViewHelper.calcDiffs(wc, false)
-                ChangesNotifier.notifyAllChannels(wc)
+                ChangesNotifier.I.notifyAllChannels(wc)
             } 
             log.info("Requesting time: " + (System.currentTimeMillis() - startTime) / 1000 + " s.")
             return true;

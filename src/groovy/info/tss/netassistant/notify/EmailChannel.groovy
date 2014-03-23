@@ -45,7 +45,7 @@ public class EmailChannel implements NotificationChannel {
      * Send email notifications
      */
     @Override
-    void notify(WebChange w) {
+    void inform(WebChange w) {
         Session session = authenticator ? Session.getDefaultInstance(props, authenticator) : Session.getDefaultInstance(props);
         try {
             Message message = new MimeMessage(session);

@@ -26,7 +26,7 @@ class SystemTrayChannel implements NotificationChannel {
 	}
 
     @Override
-    void notify(WebChange w) {
+    void inform(WebChange w) {
         if (!trayIcon) {
             trayIcon = new TrayIcon(image: img, tooltip: w.url, imageAutoSize: true,
                     actionPerformed: {

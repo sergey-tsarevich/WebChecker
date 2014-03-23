@@ -22,8 +22,9 @@ class JDialogChannel  implements NotificationChannel {
 	}
 
     @Override
-    void notify(WebChange w) {
+    void inform(WebChange w) {
 		def newb = [50,1,2,3,4]*1000 as byte[] // 2 seconds of beeep sound
+		
 		AudioPlayer.player.start( new ByteArrayInputStream( newb ));
 		JOptionPane.showMessageDialog(null, Jsoup.parse(w.added_txt)?.text(), w.url + " updated!", JOptionPane.INFORMATION_MESSAGE, null);
     }

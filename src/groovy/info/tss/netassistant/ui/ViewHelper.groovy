@@ -36,7 +36,7 @@ public class ViewHelper {
         def var = new diff_match_patch()
         List<diff_match_patch.Diff> diffs = var.diff_main(prev_txt, curr_txt);
         var.diff_cleanupSemantic(diffs);
-        def fullTxt = "<html>";
+		def fullTxt = "";
         def addedTxt = "";
         def delTxt = "";
         def linkOld, linkNew
@@ -59,12 +59,12 @@ public class ViewHelper {
                             linkOld += df.text.substring(0,endLinkIdx) + '</span></a><br>'
 
                             def idx = linkNew.indexOf('>'); // end of <a tag
-                            linkNew = linkNew.substring(0, idx+1).replaceAll("\n","") + "<span style='background-color:#b0ffa0'>" + linkNew.substring(idx+1)
+                            linkNew = linkNew.substring(0, idx+1).replaceAll("\n","") + "<span class='ch'>" + linkNew.substring(idx+1)
                             fullTxt += linkNew
                             addedTxt += linkNew + "\n"
 
                             def idxO = linkOld.indexOf('>'); // end of <a tag
-                            linkOld = linkOld.substring(0, idxO+1).replaceAll("\n","") + "<span style='background-color:#ffa0a0'>" + linkOld.substring(idxO+1)
+                            linkOld = linkOld.substring(0, idxO+1).replaceAll("\n","") + "<span class='ch'>" + linkOld.substring(idxO+1)
                             fullTxt += linkOld
                             delTxt += linkOld + "\n"
 
@@ -90,7 +90,7 @@ public class ViewHelper {
                         linkNew += df.text
                     } else {
                         addedTxt += df.text + "\n"
-                        fullTxt += "<span style='background-color:#b0ffa0'>" + df.text + "</span>"
+                        fullTxt += "<span class='ch'>" + df.text + "</span>"
                     }
                     break
                 case diff_match_patch.Operation.DELETE:
@@ -98,13 +98,12 @@ public class ViewHelper {
                         linkOld += df.text
                     } else {
                         delTxt += df.text + "\n"
-                        fullTxt += "<span style='background-color:#ffa0a0'>" + df.text + "</span>"
+                        fullTxt += "<span class='ch'>" + df.text + "</span>"
                     }
                     break
                 default:    break
             }
         }
-        fullTxt += "</html>";
         resultDiff.fullText = fullTxt
         resultDiff.addedText = addedTxt
         resultDiff.deletedText = delTxt

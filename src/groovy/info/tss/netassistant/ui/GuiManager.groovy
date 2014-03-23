@@ -84,7 +84,7 @@ class GuiManager {
                         swing.filterFld.text = w.filter?:""
 						swing.periodFld.text = w.check_period?:""
                         swing.viewedChBox.selected = w.viewed
-                        swing.fullTxtPane.text = "<html><div  style=\"margin:20px 40px;\">" + (w.fullTxt?:"") + "</div></html>"
+						swing.fullTxtPane.text = "<html><head><style> .ch, .ch *{background-color:#b0ffa0;} </style></head><body style=\"margin:20px 40px;\">" + (w.fullTxt?:"") + "</body></html>"
                         if (w.added_txt && !w.viewed)
                             swing.changesPane.text = "<html><div  style=\"margin: 20px 40px;\">" +
                                     w.added_txt.split(CHANGED_TEXT_SEPARATOR).findAll{it}.join("<hr><br>") + "</div></html>"
