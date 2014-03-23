@@ -22,6 +22,9 @@ import javax.swing.event.HyperlinkListener
 import javax.swing.text.html.HTMLEditorKit
 import java.awt.Desktop
 import java.awt.FlowLayout
+import java.awt.Toolkit
+import java.awt.datatransfer.Clipboard
+import java.awt.datatransfer.StringSelection
 
 import static java.awt.BorderLayout.*
 import static javax.swing.JSplitPane.HORIZONTAL_SPLIT
@@ -37,6 +40,7 @@ class GuiManager {
     private static SqLiteManager sqlMan = SqLiteManager.SL;
     private static SwingBuilder swing = new SwingBuilder()
     private static DefaultListModel listModel = new DefaultListModel();
+    private static WebChange currentWCh;
 
 	public static String CHANGED_TEXT_SEPARATOR = "\b";
 	
@@ -49,7 +53,6 @@ class GuiManager {
     }
 
     public static void buildUI() {
-        def currentWCh = null
         def showMsg = { msg, color ->
             swing.infoLbl.text = "<html><font color='${color}'>${msg}</font></html>";
             new Timer().runAfter(5000) { swing.infoLbl.text = "" }
@@ -84,7 +87,7 @@ class GuiManager {
                         swing.filterFld.text = w.filter?:""
 						swing.periodFld.text = w.check_period?:""
                         swing.viewedChBox.selected = w.viewed
-						swing.fullTxtPane.text = "<html><head><style> .ch, .ch *{background-color:#b0ffa0;} </style></head><body style=\"margin:20px 40px;\">" + (w.fullTxt?:"") + "</body></html>"
+						swing.fullTxtPane.text = "<html><head><style> .ch_add, .ch_add *{background-color:#b0ffa0;}.ch_del, .ch_del *{background-color:#ffa0a0;} </style></head><body style=\"margin:20px 40px;\">" + (w.fullTxt?:"") + "</body></html>"
                         if (w.added_txt && !w.viewed)
                             swing.changesPane.text = "<html><div  style=\"margin: 20px 40px;\">" +
                                     w.added_txt.split(CHANGED_TEXT_SEPARATOR).findAll{it}.join("<hr><br>") + "</div></html>"
@@ -148,6 +151,19 @@ class GuiManager {
 					sqlMan.createOrUpdateWChange(it);
 				}
 			})
+			action(id: 'popupMenuShow', closure: { e ->
+				if (e.isPopupTrigger()) {
+					popupMenu {
+						menuItem{
+							action(name:'Copy html content', closure:{
+                                StringSelection selection = new StringSelection( "fullTxtPane".equals(e.source.name) ? currentWCh?.fullTxt : currentWCh?.added_txt);
+                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                                clipboard.setContents(selection, selection);
+						    })
+						}
+					}.show(e.getComponent(), e.getX(), e.getY())
+				}
+			})
         }
 
         def frame = swing.frame(title: '<44>', size: [640, 480], defaultCloseOperation: EXIT_ON_CLOSE, show: true,
@@ -198,7 +214,7 @@ class GuiManager {
                             }
                         }
                         scrollPane(constraints: CENTER, border: BorderFactory.createTitledBorder('added: ')) {
-                            textPane(id: 'changesPane', contentType: 'text/html')
+                            textPane(id: 'changesPane', contentType: 'text/html', mousePressed: popupMenuShow.closure)
                         }
                     }
                     splitPane (constraints: CENTER, orientation: HORIZONTAL_SPLIT, dividerLocation: 150){
@@ -206,7 +222,7 @@ class GuiManager {
 							list(id: 'urlsList', model: listModel, valueChanged: selectAction.closure)
 						}
                         scrollPane(constraints: CENTER, border: BorderFactory.createTitledBorder('content: ')) {
-                            textPane(id: 'fullTxtPane', contentType: 'text/html')
+                            textPane(id: 'fullTxtPane', contentType: 'text/html', mousePressed: popupMenuShow.closure)
                         }
                     }
                 }
@@ -249,8 +265,7 @@ class GuiManager {
                         if (!url) {
                             url =  ViewHelper.autoCompleteUrl(swing.urlFld.text) + "/" +e.description
                         }
-//                        Desktop.getDesktop().browse(url); // works for windows
-                        Desktop.getDesktop().browse(url.toURI()); // works for linux, java 7 may be?
+                        Desktop.getDesktop().browse(url.toURI());
                     }
                 }
             }

@@ -15,7 +15,7 @@ Features:
     - System tray and email notifications
 
 Problems:
-    - Swing editor correct move </span> tag and ignore '.ch *' selector
+    - Swing editor moves '</span>' tag and ignore '.ch *' selector
 
 Thanks to:
 Free icon resource http://zen-nikki.deviantart.com/art/Web-browser-Icons-85610575

@@ -59,12 +59,12 @@ public class ViewHelper {
                             linkOld += df.text.substring(0,endLinkIdx) + '</span></a><br>'
 
                             def idx = linkNew.indexOf('>'); // end of <a tag
-                            linkNew = linkNew.substring(0, idx+1).replaceAll("\n","") + "<span class='ch'>" + linkNew.substring(idx+1)
+                            linkNew = linkNew.substring(0, idx+1).replaceAll("\n","") + "<span class='ch_add'>" + linkNew.substring(idx+1)
                             fullTxt += linkNew
                             addedTxt += linkNew + "\n"
 
                             def idxO = linkOld.indexOf('>'); // end of <a tag
-                            linkOld = linkOld.substring(0, idxO+1).replaceAll("\n","") + "<span class='ch'>" + linkOld.substring(idxO+1)
+                            linkOld = linkOld.substring(0, idxO+1).replaceAll("\n","") + "<span class='ch_del'>" + linkOld.substring(idxO+1)
                             fullTxt += linkOld
                             delTxt += linkOld + "\n"
 
@@ -90,7 +90,7 @@ public class ViewHelper {
                         linkNew += df.text
                     } else {
                         addedTxt += df.text + "\n"
-                        fullTxt += "<span class='ch'>" + df.text + "</span>"
+                        fullTxt += "<span class='ch_add'>" + df.text + "</span>"
                     }
                     break
                 case diff_match_patch.Operation.DELETE:
@@ -98,7 +98,7 @@ public class ViewHelper {
                         linkOld += df.text
                     } else {
                         delTxt += df.text + "\n"
-                        fullTxt += "<span class='ch'>" + df.text + "</span>"
+                        fullTxt += "<span class='ch_del'>" + df.text + "</span>"
                     }
                     break
                 default:    break
