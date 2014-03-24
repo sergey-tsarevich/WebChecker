@@ -16,6 +16,7 @@ import javax.swing.BoxLayout
 import javax.swing.DefaultListModel
 import javax.swing.ImageIcon
 import javax.swing.JEditorPane
+import javax.swing.JList
 import javax.swing.JOptionPane
 import javax.swing.event.HyperlinkEvent
 import javax.swing.event.HyperlinkListener
@@ -25,6 +26,8 @@ import java.awt.FlowLayout
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.StringSelection
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 
 import static java.awt.BorderLayout.*
 import static javax.swing.JSplitPane.HORIZONTAL_SPLIT
@@ -87,6 +90,7 @@ class GuiManager {
                         swing.filterFld.text = w.filter?:""
 						swing.periodFld.text = w.check_period?:""
                         swing.viewedChBox.selected = w.viewed
+						swing.headersPane.text = w.headers
 						swing.fullTxtPane.text = "<html><head><style> .ch_add, .ch_add *{background-color:#b0ffa0;}.ch_del, .ch_del *{background-color:#ffa0a0;} </style></head><body style=\"margin:20px 40px;\">" + (w.fullTxt?:"") + "</body></html>"
                         if (w.added_txt && !w.viewed)
                             swing.changesPane.text = "<html><div  style=\"margin: 20px 40px;\">" +
@@ -98,7 +102,8 @@ class GuiManager {
             action(id: 'addAction', closure: { e ->
                 def url = swing.urlFld.text;
                 if (InputValidator.isUrlAvailable(url) ) {
-                    def change = new WebChange(url: url, filter: swing.filterFld.text, check_period: swing.periodFld.text, notifications: getNotificationsList(swing))
+                    def change = new WebChange(url: url, filter: swing.filterFld.text, check_period: swing.periodFld.text, 
+						notifications: getNotificationsList(swing), headers: swing.headersPane.text)
                     change.id = sqlMan.createOrUpdateWChange(change);
                     NetFilter.requestNotifyAndSave([change].toArray(), true)
                     showMsg('Added.', 'green')
@@ -107,6 +112,22 @@ class GuiManager {
                     showMsg('Url is not available!', 'red')
                 }
             })
+			action(id: 'updAction', closure: { e ->
+				def url = swing.urlFld.text;
+				if (InputValidator.isUrlAvailable(url) ) {
+					currentWCh.url = url
+					currentWCh.filter = swing.filterFld.text
+					currentWCh.check_period = swing.periodFld.text
+					currentWCh.notifications = getNotificationsList(swing)
+					currentWCh.headers = swing.headersPane.text
+					sqlMan.createOrUpdateWChange(currentWCh);
+					NetFilter.requestNotifyAndSave([currentWCh].toArray(), true)
+					showMsg('Updated.', 'green')
+					refreshUrlsList()
+				} else {
+					showMsg('Url is not available!', 'red')
+				}
+			})
             action(id: 'delAction', closure: { e ->
                 if (JOptionPane.showConfirmDialog(null, "Are you sure to delete selected urls?")) return;
                 urlsList.selectedValues.each{
@@ -197,7 +218,9 @@ class GuiManager {
 										borderLayout()
 										textField(constraints: CENTER, id: 'periodFld') 
 									}
-									
+									scrollPane(constraints: SOUTH, border: BorderFactory.createTitledBorder('"Header-Name: value CRLF": ')) {
+										textPane(id: 'headersPane')
+									}
                                 }
                                 panel(constraints: CENTER){
 									borderLayout()
@@ -208,6 +231,7 @@ class GuiManager {
 									}
 									panel(constraints: CENTER) {
 	                                    button('Add', id: 'addBtn', actionPerformed: addAction.closure)
+										button('Update', id: 'updBtn', actionPerformed: updAction.closure)
 	                                    button('Delete', id: 'delBtn', actionPerformed: delAction.closure)
 									}
                                 }
@@ -234,6 +258,18 @@ class GuiManager {
         swing.fullTxtPane.editorKit = kitFull
         addLinkHandling(swing.fullTxtPane)
         addLinkHandling(swing.changesPane)
+
+        swing.urlsList.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    WebChange w = evt.source.selectedValue
+                    if (Desktop.isDesktopSupported()) { // supported from Java 6
+                        def url = ViewHelper.autoCompleteUrl(w.url);
+                        Desktop.getDesktop().browse(url.toURI());
+                    }
+                }
+            }
+        });
 
         adjustFrameSize(frame)
         centerOnScreen(frame)

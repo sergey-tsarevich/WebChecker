@@ -43,6 +43,9 @@ def frame = swing.frame(title: '<44>', size: [640, 480], defaultCloseOperation: 
                                 borderLayout()
                                 textField(constraints: CENTER, id: 'periodFld')
                             }
+							scrollPane(constraints: SOUTH, border: BorderFactory.createTitledBorder('"Header-Name: value CRLF": ')) {
+								textPane(id: 'headersPane')
+ 						    }
                         }
                         panel(constraints: CENTER){
                             borderLayout()
@@ -53,6 +56,7 @@ def frame = swing.frame(title: '<44>', size: [640, 480], defaultCloseOperation: 
                             }
                             panel(constraints: CENTER) {
                                 button('Add', id: 'addBtn')
+								button('Update', id: 'updBtn')
                                 button('Delete', id: 'delBtn')
                             }
                         }

@@ -18,6 +18,7 @@ class WebChange {
     def curr_html    // current html to compare
     def check_period    // period after which url will be checked
     def notifications=""    // comma-separated notification types
+	def headers=""    // format: "Header-Name: value CRLF"
 
     def fullTxt      // full colored html for UI only
 

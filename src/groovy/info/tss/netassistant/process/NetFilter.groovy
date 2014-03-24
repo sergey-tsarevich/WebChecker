@@ -51,8 +51,11 @@ public class NetFilter {
                 .addProtocols("img", "src", "http", "https");
 
 	
-
-    public static void requestNotifyAndSave(def webChangesList, boolean forceRequest) {
+    /*
+    * Return true if at least one url was requested.
+    */
+    public static boolean requestNotifyAndSave(def webChangesList, boolean forceRequest) {
+        boolean wasRequested = false;
         log.info("Start requesting!")
         def startTime = System.currentTimeMillis()
         webChangesList.each{wch-> //WebChange
@@ -63,6 +66,7 @@ public class NetFilter {
 					try {
 						while (!NetFilter.makelRequest(wch) && ++attempts < NetFilter.REQUEST_REPEATS_ON_ERRORS);
 						SqLiteManager.SL.createOrUpdateWChange(wch);
+                        wasRequested = true;
 					} catch(Exception e){
 						log.error("Exception during request $wch.url : ", e);
 					}
@@ -70,6 +74,7 @@ public class NetFilter {
 
         }
         log.info("Total request time: " + (System.currentTimeMillis() - startTime) / 1000 + " s.")
+        return wasRequested;
     }
 
     public static boolean makelRequest(WebChange wc) {
@@ -77,15 +82,24 @@ public class NetFilter {
             log.info("Request url: $wc.url")
             def startTime = System.currentTimeMillis()
             def url = ViewHelper.autoCompleteUrl(wc.url)
-            Connection.Response response = Jsoup.connect(url).timeout(DEFAULT_SOCKET_TIMEOUT)
+            Connection conn = Jsoup.connect(url).timeout(DEFAULT_SOCKET_TIMEOUT)
                     .userAgent(USER_AGENT_HEADER)
                     .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
                     .header("Accept-Encoding", "gzip,deflate,sdch")
                     .header("Accept-Language", "en-US,en;q=0.8")
                     .header("Cache-Control", "no-cache")
                     .header("DNT", "1")
-                    .header("Pragma", "no-cache")
-                    .ignoreContentType(true).execute();
+                    .header("Pragma", "no-cache");
+			wc.headers?.split("\n").each{h->
+                if (h) {
+                    def idx = h.indexOf(":");
+                    if (idx<0) idx = h.size()
+                    def name = h.substring(0, idx);
+                    def value = h.substring(idx+1).trim();
+                    conn.header(name, value)
+                }
+			}
+            Connection.Response response = conn.ignoreContentType(true).execute();
             def currTxt = ""
             def currHtml = ""
 
