@@ -30,7 +30,8 @@ public class DbInitializer {
     		deleted_txt TEXT,           -- difference that was deleted
     		check_period INTEGER default 86400000, -- check period (default one day)
             notifications TEXT default '1,2', -- comma separated notifications types
-			headers TEXT             	-- extra headers for url
+			headers TEXT,             	-- extra headers for url
+			tag TEXT             		-- tag to group to
         );
     """
 

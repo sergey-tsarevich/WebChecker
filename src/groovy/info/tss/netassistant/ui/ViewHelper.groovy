@@ -1,5 +1,6 @@
 package info.tss.netassistant.ui
 
+import info.tss.netassistant.notify.ParseUtils;
 import info.tss.netassistant.store.structure.Diff
 import info.tss.netassistant.store.structure.WebChange
 import name.fraser.neil.plaintext.diff_match_patch
@@ -117,8 +118,8 @@ public class ViewHelper {
         def resultDiff = getColorizedHtml(wch.prev_html, wch.curr_html)
         wch.fullTxt = resultDiff.fullText ?:"";
         if (onlyFull) return;
-        if(resultDiff.addedText) wch.added_txt += GuiManager.CHANGED_TEXT_SEPARATOR + resultDiff.addedText
-        if(resultDiff.deletedText) wch.deleted_txt += GuiManager.CHANGED_TEXT_SEPARATOR + resultDiff.deletedText
+        if(resultDiff.addedText) wch.added_txt += ParseUtils.CHANGED_TEXT_SEPARATOR + resultDiff.addedText
+        if(resultDiff.deletedText) wch.deleted_txt += ParseUtils.CHANGED_TEXT_SEPARATOR + resultDiff.deletedText
     }
 
 

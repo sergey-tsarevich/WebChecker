@@ -4,7 +4,7 @@ package info.tss.netassistant.store.structure
  * Author: Tss
  * Date: 30.10.13
  */
-class WebChange {
+class WebChange implements Comparable{
     def id
     def url                      // url to check for changes
     def filter                   // CSS or jquery-like selector syntax
@@ -19,15 +19,22 @@ class WebChange {
     def check_period    // period after which url will be checked
     def notifications=""    // comma-separated notification types
 	def headers=""    // format: "Header-Name: value CRLF"
+	def tag =""    // tag to group and use as prefix for url
 
     def fullTxt      // full colored html for UI only
 
-    @Override
+	
+    public int compareTo(Object o) {
+		return this.toString().compareTo(o.toString());
+	}
+
+
+	@Override
     String toString() {
         if(!viewed && (added_txt || deleted_txt)) {
-            return "<html><font color='#F88017'>" + this.url + "</font></html>";
+            return "<html><font color='#F88017'>" + (this.tag?:"") + this.url + "</font></html>";
         } else {
-            return this.url;
+            return (this.tag?:"") + this.url;
         }
     }
 }
