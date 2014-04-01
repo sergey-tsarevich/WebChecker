@@ -32,9 +32,13 @@ class WebChange implements Comparable{
 	@Override
     String toString() {
         if(!viewed && (added_txt || deleted_txt)) {
-            return "<html><font color='#F88017'>" + (this.tag?:"") + this.url + "</font></html>";
+            return "<html><font color='#F88017'>" + toPresentation() + "</font></html>";
         } else {
-            return (this.tag?:"") + this.url;
+            return toPresentation();
         }
+    }
+
+    String toPresentation() {
+        return (this.tag?:"") + this.url;
     }
 }

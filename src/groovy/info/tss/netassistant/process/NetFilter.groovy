@@ -38,7 +38,7 @@ public class NetFilter {
                         .addTags(
                         "a", "b", "blockquote", "br", "cite", "code", "dd", "dl", "dt", "em",
                         "i", "li", "ol", "p", "pre", "q", "small", "strike", "strong", "sub",
-                        "sup", "u", "ul")
+                        "sup", "table", "tbody", "tr", "td", "u", "ul")
                         .addAttributes("a", "href")
                         .addAttributes("blockquote", "cite")
                         .addAttributes("q", "cite")

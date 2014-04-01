@@ -84,7 +84,7 @@ public class HttpFilterTest extends GroovyTestCase {
                         .addTags(
                         "a", "b", "blockquote", "br", "cite", "code", "dd", "dl", "dt", "em",
                         "i", "li", "ol", "p", "pre", "q", "small", "strike", "strong", "sub",
-                        "sup", "u", "ul")
+                        "sup", "table", "tbody", "tr", "td", "u", "ul")
                         .addAttributes("a", "href")
                         .addAttributes("blockquote", "cite")
                         .addAttributes("q", "cite")
@@ -96,7 +96,7 @@ public class HttpFilterTest extends GroovyTestCase {
                 .addAttributes("img", "align", "alt", "height", "src", "title", "width")
                 .addProtocols("img", "src", "http", "https"));
 		assertNotNull(safe);
-//        println safe;
+        println safe;
 	}
 
     public void testTmpQueries() {

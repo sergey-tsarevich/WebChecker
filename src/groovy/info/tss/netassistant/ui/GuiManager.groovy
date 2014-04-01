@@ -48,10 +48,10 @@ class GuiManager {
 
     public static void reloadUrlsList() {
         listModel.clear();
-		sqlMan.getAllWebChanges().sort{it.toString()}.each {
+		sqlMan.getAllWebChanges().sort{it.toPresentation()}.each {
+            ViewHelper.calcDiffs(it, true);
             listModel.addElement(it);
         }
-        listModel.fireContentsChanged(listModel, 0, listModel.size())
     }
 
     public static void refreshUrlList() {
@@ -79,7 +79,9 @@ class GuiManager {
             if (notifications) notifications = notifications -',';
             return notifications
         }
-
+		
+		reloadUrlsList()
+		
         swing.actions() {
             action(id: 'selectAction', closure: { e ->
                 def l = e.source
@@ -118,6 +120,7 @@ class GuiManager {
                     NetFilter.requestNotifyAndSave([change].toArray(), true)
                     showMsg('Added.', 'green')
                     listModel.addElement(change)
+                    sortListModel();
                 } else {
                     showMsg('Url is not available!', 'red')
                 }
@@ -135,6 +138,7 @@ class GuiManager {
                     NetFilter.requestNotifyAndSave([currentWCh].toArray(), true)
                     showMsg('Updated.', 'green')
                     refreshUrlList()
+                    sortListModel()
                 } else {
                     showMsg('Url is not available!', 'red')
                 }
@@ -286,9 +290,17 @@ class GuiManager {
                 }
             }
         });
-        reloadUrlsList()
+        
         adjustFrameSize(frame)
         centerOnScreen(frame)
+    }
+
+    private static void sortListModel() {
+        def lsts = listModel.iterator().toList().sort { it.toPresentation() }
+        listModel.clear()
+        lsts.each {
+            listModel.addElement(it);
+        }
     }
 
     def static centerOnScreen(component) {

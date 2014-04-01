@@ -112,12 +112,16 @@ public class ViewHelper {
         return resultDiff;
     }
 
-    static void calcDiffs(WebChange wch, boolean onlyFull){
+    /*
+     * @param wch - WebChange to calculate diffs
+     * @param onlyFull4DBLoad - calculate only full diff without added txt and deleted txt to avoid duplicating on load
+     */
+    static void calcDiffs(WebChange wch, boolean onlyFull4DBLoad){
         // todo: check if its rendering is ok -> if not use flag to mark to handle html
 //        def resultList = getColorizedHtml(wch.prev_txt, wch.curr_txt)
         def resultDiff = getColorizedHtml(wch.prev_html, wch.curr_html)
         wch.fullTxt = resultDiff.fullText ?:"";
-        if (onlyFull) return;
+        if (onlyFull4DBLoad) return;
         if(resultDiff.addedText) wch.added_txt += ParseUtils.CHANGED_TEXT_SEPARATOR + resultDiff.addedText
         if(resultDiff.deletedText) wch.deleted_txt += ParseUtils.CHANGED_TEXT_SEPARATOR + resultDiff.deletedText
     }
