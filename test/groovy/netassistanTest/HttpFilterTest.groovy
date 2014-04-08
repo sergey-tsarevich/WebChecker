@@ -2,6 +2,7 @@ package netassistanTest
 
 import info.tss.netassistant.process.NetFilter
 import info.tss.netassistant.store.structure.Diff
+import info.tss.netassistant.store.structure.WebChange
 import info.tss.netassistant.ui.ViewHelper
 import name.fraser.neil.plaintext.diff_match_patch
 import org.jsoup.Jsoup
@@ -9,7 +10,6 @@ import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.jsoup.safety.Whitelist
 
-import java.util.concurrent.TimeUnit
 
 /**
  * Test of JSOUP! 
@@ -110,5 +110,15 @@ public class HttpFilterTest extends GroovyTestCase {
 
         println NetFilter.prefixUrlsWithBase(testHtml, "http://sobor.by/")
     }
+
+    public void testHttpsRequests(){
+
+        println NetFilter.makelRequest(
+                new WebChange(url:  "https://www.google.com/search?q=%D0%94%D0%BE%D0%BB%D0%B3%D1%83%D1%88%D0%B5%D0%B2+%D0%9C%D0%B8%D1%85%D0%B0%D0%B8%D0%BB+%D0%92%D0%B0%D0%BB%D0%B5%D1%80%D1%8C%D0%B5%D0%B2%D0%B8%D1%87&rlz=1C1FGGD_enBY504BY504&oq=%D0%B4%D0%BE%D0%BB%D0%B3%D1%83%D1%88%D0%B5%D0%B2+%D0%BC%D0%B8%D1%85%D0%B0%D0%B8%D0%BB&aqs=chrome.2.69i57j69i59l2j69i61j0l2.12288j0j7&sourceid=chrome&espv=210&es_sm=122&ie=UTF-8",
+                )
+                )
+
+    }
+
 
 }

@@ -4,8 +4,26 @@ apply plugin: 'idea'
 apply plugin:'application'
 
 group= '<44>'
-version = '0.1'
+version = '0.2b'
 mainClassName = "info.tss.netassistant.run.Starter"
+
+distZip {
+    into(project.name-project.version) {
+        from '.'
+        include 'conf/*'
+    }
+}
+//applicationDefaultJvmArgs = [ "-Duser.timezone=EET -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=128M -Xmx196m" ]
+
+startScripts {  // workaround for adding 'dist/conf' to classpath
+    classpath += files('src/dist/conf')
+    doLast {
+        def windowsScriptFile = file getWindowsScript()
+        def unixScriptFile    = file getUnixScript()
+        windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib\\conf', '%APP_HOME%\\conf')
+        unixScriptFile.text    = unixScriptFile.text.replace('$APP_HOME/lib/conf', '$APP_HOME/conf')
+    }
+}
 
 repositories {
     flatDir { dirs "lib" }
@@ -13,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.1.6'
+    compile 'org.codehaus.groovy:groovy-all:2.1.8'
     compile 'log4j:log4j:1.2.17'
     compile 'org.slf4j:slf4j-api:1.7.5'
     compile 'org.slf4j:slf4j-log4j12:1.7.5'

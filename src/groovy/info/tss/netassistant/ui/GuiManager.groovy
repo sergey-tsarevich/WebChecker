@@ -55,14 +55,14 @@ class GuiManager {
     }
 
     public static void refreshUrlList() {
-        listModel.fireContentsChanged(listModel, 0, listModel.size())
-        if (swing.urlsList.getSelectedIndices().length == 1) {
+        if (swing.urlsList.getSelectedIndices().size() == 1) {
             def selIdx = swing.urlsList.getSelectedIndices()[0];
             swing.urlsList.clearSelection();
             swing.urlsList.setSelectedIndex(selIdx);
         } else {
             swing.urlsList.clearSelection();
         }
+		listModel.fireContentsChanged(listModel, 0, listModel.size())
     }
 
     public static void buildUI() {
@@ -188,7 +188,7 @@ class GuiManager {
                 }
             })
             action(id: 'popupMenuShow', closure: { e ->
-                if (e.isPopupTrigger()) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
                     popupMenu {
                         menuItem{
                             action(name:'Copy html content', closure:{
@@ -301,6 +301,7 @@ class GuiManager {
         lsts.each {
             listModel.addElement(it);
         }
+		listModel.fireContentsChanged(listModel, 0, listModel.size());
     }
 
     def static centerOnScreen(component) {

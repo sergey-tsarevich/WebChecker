@@ -2,7 +2,6 @@ package info.tss.netassistant.run
 
 import info.tss.netassistant.AppProps
 import info.tss.netassistant.process.InetViewerJob
-import info.tss.netassistant.store.SqLiteManager
 import info.tss.netassistant.ui.GuiManager
 import org.quartz.*
 import org.quartz.impl.StdSchedulerFactory
@@ -18,21 +17,11 @@ public class Starter {
 
     public static void main(String[] args) {
         // init config and other resources
-        new Starter().init();
+        runJobScheduler();
         GuiManager.buildUI();
     }
 
-    def init(){
-        readConfig();
-        runJobScheduler();
-    }
-
-    public void readConfig() {
-        InputStream is = getClass().getClassLoader().getResource(AppProps.CONF_FILE).openStream();
-        AppProps.initConfig(is);
-    }
-
-    private void runJobScheduler()  {
+    private static void runJobScheduler()  {
         try {
             SchedulerFactory sf = new StdSchedulerFactory();
             Scheduler sched = sf.getScheduler();
