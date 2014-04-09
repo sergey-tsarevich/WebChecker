@@ -68,7 +68,7 @@ public class NetFilter {
 						SqLiteManager.SL.createOrUpdateWChange(wch);
                         wasRequested = true;
 					} catch(Exception e){
-						log.error("Exception during request $wch.url : ", e);
+						log.error("Exception during request $wch.url :  $e");
 					}
 			}
 
