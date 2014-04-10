@@ -103,7 +103,7 @@ class GuiManager {
                         swing.viewedChBox.selected = w.viewed
                         swing.headersPane.text = w.headers
                         swing.tagFld.text = w.tag
-                        swing.fullTxtPane.text = "<html><head><style> .ch_add, .ch_add *{background-color:#b0ffa0;}.ch_del, .ch_del *{background-color:#ffa0a0;} </style></head><body style=\"margin:20px 40px;\">" + (w.fullTxt?:"") + "</body></html>"
+                        swing.fullTxtPane.text = "<html><head><style> .ch_add, .ch_add *{background-color:#b0ffa0;}.ch_del, .ch_del *{background-color:#ffa0a0;} </style></head><body style=\"margin:20px 40px;\">" + (w?.fullTxt?:"") + "</body></html>"
                         if (w.added_txt && !w.viewed)
                             swing.changesPane.text = "<html><div  style=\"margin: 20px 40px;\">" +
                                     w.added_txt.split(CHANGED_TEXT_SEPARATOR).findAll{it}.join("<hr><br>") + "</div></html>"
