@@ -20,6 +20,7 @@ class WebChange implements Comparable{
     def notifications=""    // comma-separated notification types
 	def headers=""    // format: "Header-Name: value CRLF"
 	def tag =""    // tag to group and use as prefix for url
+	def active     // if url with changes is active
 
     def fullTxt      // full colored html for UI only
 

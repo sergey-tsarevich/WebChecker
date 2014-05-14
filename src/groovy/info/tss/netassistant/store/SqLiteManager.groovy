@@ -22,7 +22,7 @@ public class SqLiteManager {
 
     def List<WebChange> getAllWebChanges(){
         List<WebChange> result = [];
-        sql.eachRow("SELECT * FROM WEB_CHANGE") {
+        sql.eachRow("SELECT * FROM WEB_CHANGE WHERE ACTIVE = 1") {
             result << new WebChange( it.toRowResult() )
         }
 

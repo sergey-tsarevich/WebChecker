@@ -31,7 +31,8 @@ public class DbInitializer {
     		check_period INTEGER default 86400000, -- check period (default one day)
             notifications TEXT default '1,2', -- comma separated notifications types
 			headers TEXT,             	-- extra headers for url
-			tag TEXT             		-- tag to group to
+			tag TEXT,             		-- tag to group to
+			active integer default 1    -- if row active
         );
     """
 
