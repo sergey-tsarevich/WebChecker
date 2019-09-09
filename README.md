@@ -19,3 +19,6 @@ Problems:
 
 Thanks to:
 Free icon resource http://zen-nikki.deviantart.com/art/Web-browser-Icons-85610575
+
+
+https://superuser.com/questions/988379/how-do-i-run-java-apps-upscaled-on-a-high-dpi-display

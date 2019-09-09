@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteConfig
 import org.sqlite.SQLiteConnectionPoolDataSource
 
+import java.nio.file.Paths
 import java.sql.BatchUpdateException
 
 /**
@@ -45,7 +46,12 @@ public class DbInitializer {
 
     private DbInitializer() {
         this.dbPath =  DB_NAME
-        if (AppProps.getDbPath()) this.dbPath = AppProps.getDbPath();
+        if (AppProps.getDbPath()) {
+            this.dbPath = AppProps.getDbPath()
+        } else { // using default DB
+            this.dbPath = Paths.get("").toAbsolutePath().toString() + "/src/dist" + DB_NAME
+            log.info("Loading default DB: {}", this.dbPath)
+        }
         initConnection();
         if (Boolean.valueOf(AppProps.isDropDb())) this.dropAllTables();
 
