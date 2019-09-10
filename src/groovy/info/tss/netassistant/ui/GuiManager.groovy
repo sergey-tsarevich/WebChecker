@@ -202,8 +202,9 @@ class GuiManager {
             })
         }
 
-        def frame = swing.frame(title: '<44>', size: [640, 480], defaultCloseOperation: EXIT_ON_CLOSE, show: true,
-                iconImage: new ImageIcon(swing.class.classLoader.getResource('4.png')).image) {
+        def frame = swing.frame(title: '<44>', size: [640, 480], defaultCloseOperation: EXIT_ON_CLOSE, show: true
+//                ,iconImage: new ImageIcon(swing.class.classLoader.getResource('4.png')).image
+        ) {
             panel {
                 borderLayout()
                 panel(constraints: NORTH, border: BorderFactory.createTitledBorder('url:')) {

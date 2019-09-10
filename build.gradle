@@ -13,7 +13,9 @@ distZip {
         include 'conf/*'
     }
 }
-//applicationDefaultJvmArgs = [ "-Duser.timezone=EET -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=128M -Xmx196m" ]
+//applicationDefaultJvmArgs = [ "-Dsun.java2d.dpiaware=true" ]
+//applicationDefaultJvmArgs = [ "-Dsun.java2d.uiScale=2.5" ]
+applicationDefaultJvmArgs = [ "-Duser.timezone=EET -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=128M -Xmx196m" ]
 
 startScripts {  // workaround for adding 'dist/conf' to classpath
     classpath += files('src/dist/conf')
