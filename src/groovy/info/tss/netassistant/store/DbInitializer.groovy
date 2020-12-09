@@ -12,8 +12,6 @@ import java.sql.BatchUpdateException
 
 /**
  * Database initializer class. Store init db sql script
- * Author: TsS
- * Date: 3/9/13
  */
 public class DbInitializer {
     public static final String INIT_SCRIPT = """
@@ -49,6 +47,7 @@ public class DbInitializer {
         if (AppProps.getDbPath()) {
             this.dbPath = AppProps.getDbPath()
         } else { // using default DB
+//            this.dbPath = Paths.get("").toAbsolutePath().toString() + "/src/dist" + DB_NAME
             this.dbPath = Paths.get("").toAbsolutePath().toString() + "/src/dist" + DB_NAME
             log.info("Loading default DB: {}", this.dbPath)
         }

@@ -3,8 +3,6 @@ package info.tss.netassistant.notify
 import org.jsoup.Jsoup
 
 import javax.swing.JOptionPane;
-import sun.audio.AudioPlayer;
-
 import info.tss.netassistant.store.structure.WebChange;
 
 
